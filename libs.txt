@@ -1,0 +1,7 @@
+DBI Tail uses one library that is not part of Java standard platform.
+
+- juniversalchardet is a Java port of 'universalchardet', that is the encoding detector library of Mozilla
+
+	Source code can be found at following link: 
+	https://code.google.com/p/juniversalchardet/
+ 
