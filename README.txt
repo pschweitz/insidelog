@@ -3,8 +3,14 @@ https://ch.linkedin.com/pub/philippe-schweitzer/87/ab/2bb
 
 Download available from this page: https://github.com/pschweitz/DBITail/releases
 
+You can find packaged builds with embedded Java, so run of software will be very straightforward.
+
+Just choose the one for your operating system and architecture, then: 
+
 For Windows, run "dbiTail.bat"
 For linux, run "dbiTail.sh"
+
+Sorry for Mac users, packaged build is not available for the moment.
 
 It is released under Apache v2 License
 
