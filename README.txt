@@ -1,6 +1,11 @@
 DBI Tail is a tool created by Philippe Schweitzer
 https://ch.linkedin.com/pub/philippe-schweitzer/87/ab/2bb
 
+Download available from this page: https://github.com/pschweitz/DBITail/releases
+
+For Windows, run "dbiTail.bat"
+For linux, run "dbiTail.sh"
+
 It is released under Apache v2 License
 
 /*
@@ -23,14 +28,14 @@ Please visit GitHub page:
 https://github.com/pschweitz/DBITail
 
 
-Requires java 8.0_60or higher
+Requires java 8.0_60 or higher
 
 
 If you experience some troubles or slowdowns, it is advised to setup Java max heap size to 1Go
 
      -> Just use dbiTail.bat or dbitail.sh
      -> Or create a shortcut and fill-in/adapt following properties to your environment:
-              Target : C:\<path to java>\javaw.exe -Xmx1g -jar “C:\<path to DBI Tail>\dbi-Tail.jar" 
+              Target : C:\<path to java>\javaw.exe -Xmx1g -jar ï¿½C:\<path to DBI Tail>\dbi-Tail.jar" 
               Start in : C:\<path to DBI Tail> 
 
 
