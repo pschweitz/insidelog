@@ -56,7 +56,9 @@ public final class ApplicationContext<K, V> {
         LOGLEVEL("logger.level", String.class),
         BUFFERSIZE("tail.bufferSize", Integer.class),
         FREQUENCYINTERVAL("tail.frequencyInterval", Long.class),
-        DISPLAYCOLOR("tail.displayColor", Boolean.class);
+        DISPLAYCOLOR("tail.displayColor", Boolean.class),
+        COLORCONFIGURATION("tail.defaultColorConfiguration", String.class),
+        TREECONFIGURATION("tail.defaultTreeConfiguration", String.class);
 
         /* Long.class Boolean.class Double.class*/
         String propertyName;

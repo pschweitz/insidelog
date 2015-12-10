@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.dbiservices.monitoring.tail;
 
 /**
  *
- * @author  Philippe Schweitzer
+ * @author Philippe Schweitzer
  * @version 1.1
- * @since   16.11.2015
+ * @since 16.11.2015
  */
-
 import com.dbiservices.monitoring.common.schedulerservice.ServiceScheduler;
 import com.dbiservices.tools.ApplicationContext;
 import com.dbiservices.tools.Logger;
@@ -35,10 +33,10 @@ import java.util.StringTokenizer;
 public class InformationObject implements Serializable {
 
     private static final Logger logger = Logger.getLogger(InformationObject.class);
-    
+
     private String displayName;
     private String fullName;
-    private Path filePath;
+    private String filePath;
     private int frequency;
     private int scheduleType;
     private boolean isEnabled;
@@ -48,17 +46,17 @@ public class InformationObject implements Serializable {
     private Charset charset = null;
     private long lastFileLength = 0;
     private int elementCount = 0;
-    private String fileColors = "etc/color.cfg";
+    private String fileColors = DbiTail.colorFileName;
     private ColorConfiguration colorConfiguration = null;
-    
-    public InformationObject(String displayName, String fullName, Path filePath, int bufferSize, int frequency, boolean displayColors, String fileColors) {
+
+    public InformationObject(String displayName, String fullName, String filePath, int bufferSize, int frequency, boolean displayColors, String fileColors) {
         this(fullName, filePath, bufferSize, frequency, displayColors);
         this.displayName = displayName;
         this.fileColors = fileColors;
         this.colorConfiguration = new ColorConfiguration(fileColors);
     }
 
-    private InformationObject(String fullName, Path filePath, int bufferSize, int frequency, boolean displayColors) {
+    private InformationObject(String fullName, String filePath, int bufferSize, int frequency, boolean displayColors) {
 
         this.displayName = fullName;
         this.fullName = fullName;
@@ -97,8 +95,11 @@ public class InformationObject implements Serializable {
         WindowTextConsole windowTextConsole = (WindowTextConsole) ApplicationContext.getInstance().get(this.fullName);
         if (windowTextConsole != null) {
             windowTextConsole.setName(fullName);
-            ApplicationContext.getInstance().put(fullName, windowTextConsole);
-            ApplicationContext.getInstance().remove(this.fullName);            
+
+            if (!fullName.equals(this.fullName)) {
+                ApplicationContext.getInstance().put(fullName, windowTextConsole);
+                ApplicationContext.getInstance().remove(this.fullName);
+            }
         }
 
         this.fullName = fullName;
@@ -112,7 +113,7 @@ public class InformationObject implements Serializable {
         setName(name);
     }
 
-    public void setFilePath(Path filePath) {
+    public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
 
@@ -136,11 +137,11 @@ public class InformationObject implements Serializable {
         return fullName;
     }
 
-    public Path getFilePath() {
-        Path result = this.filePath;
+    public String getFilePath() {
+        String result = this.filePath;
 
         if (result == null) {
-            result = Paths.get(".");
+            result = ".";
         }
         return result;
     }
@@ -204,5 +205,4 @@ public class InformationObject implements Serializable {
     public void setColorConfiguration(ColorConfiguration colorConfiguration) {
         this.colorConfiguration = colorConfiguration;
     }
-
 }

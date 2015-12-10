@@ -21,14 +21,15 @@ package com.dbiservices.monitoring.tail;
  * @version 1.1
  * @since 16.11.2015
  */
+import com.dbiservices.monitoring.common.schedulerservice.IScheduledService;
 import com.dbiservices.monitoring.common.schedulerservice.ScheduledDefinition;
 import com.dbiservices.monitoring.common.schedulerservice.ServiceScheduler;
 import com.dbiservices.monitoring.tail.textconsole.IOutputConsole;
 import com.dbiservices.monitoring.tail.textconsole.SwingConsole;
+import com.dbiservices.tools.ApplicationContext;
 import com.dbiservices.tools.Logger;
 import java.io.File;
 import java.util.concurrent.Executor;
-import java.util.logging.Level;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -117,7 +118,7 @@ public class WindowTextConsole {
             case SWINGCONSOLE:
 
                 if (informationObject != null) {
-                    outputConsole = new SwingConsole(informationObject.getColorConfiguration());
+                    outputConsole = new SwingConsole(informationObject);
                 }
                 break;
         }
@@ -136,9 +137,18 @@ public class WindowTextConsole {
                     @Override
                     public void handle(ActionEvent event) {
                         if (!ServiceScheduler.getScheduledDefinitionPool().containsKey(informationObject.getFullName())) {
-                            ServiceScheduler.addScheduledDefinition(informationObject.getFullName(), new ScheduledDefinition(informationObject, new Tail(informationObject)));
 
-                            isRunning = !isRunning;
+                            IScheduledService iTail = null;
+
+                            if (informationObject.getFilePath().toLowerCase().startsWith("ssh://")) {
+                                iTail = new TailSSH(informationObject);
+                            } else {
+                                iTail = new TailFile(informationObject);
+                            }
+
+                            ServiceScheduler.addScheduledDefinition(informationObject.getFullName(), new ScheduledDefinition(informationObject, iTail));
+
+                            isRunning = true;
                             updateButtons();
                         }
                     }
@@ -157,7 +167,7 @@ public class WindowTextConsole {
                     public void handle(ActionEvent event) {
                         ServiceScheduler.removeScheduledDefinition(informationObject.getFullName());
 
-                        isRunning = !isRunning;
+                        isRunning = false;
                         updateButtons();
                     }
                 }
@@ -173,10 +183,11 @@ public class WindowTextConsole {
 
                     @Override
                     public void handle(ActionEvent event) {
+
                         ServiceScheduler.removeScheduledDefinition(informationObject.getFullName());
                         informationObject.setLastFileLength(0);
                         informationObject.setOffset(0);
-                        isRunning = !isRunning;
+                        isRunning = false;
                         updateButtons();
                     }
                 }
@@ -453,7 +464,12 @@ public class WindowTextConsole {
 
             @Override
             public void handle(WindowEvent event) {
-                ServiceScheduler.removeScheduledDefinition(title);
+
+                ServiceScheduler.removeScheduledDefinition(informationObject.getFullName());
+                informationObject.setLastFileLength(0);
+                informationObject.setOffset(0);
+                isRunning = false;
+                updateButtons();
 
                 if (!DbiTail.showMainStage) {
                     System.exit(0);
@@ -515,12 +531,12 @@ public class WindowTextConsole {
     public void readSavedFile() {
         logger.info("Open of file: " + informationObject.getFullName());
 
-            informationObject.setOffset(-1);
-            Tail tail = new Tail(informationObject);
-            
-            if (!ServiceScheduler.getScheduledDefinitionPool().containsKey(informationObject.getFullName())) {
-                ServiceScheduler.addScheduledDefinition(informationObject.getFullName(), new ScheduledDefinition(informationObject, tail));
-            }
+        informationObject.setOffset(-1);
+        TailFile tail = new TailFile(informationObject);
+
+        if (!ServiceScheduler.getScheduledDefinitionPool().containsKey(informationObject.getFullName())) {
+            ServiceScheduler.addScheduledDefinition(informationObject.getFullName(), new ScheduledDefinition(informationObject, tail));
+        }
     }
 
     public void appendText(final String content) {
@@ -570,7 +586,7 @@ public class WindowTextConsole {
 
             case SWINGCONSOLE:
 
-                outputConsole = new SwingConsole(informationObject.getColorConfiguration());
+                outputConsole = new SwingConsole(informationObject);
                 break;
 
         }
@@ -734,5 +750,9 @@ public class WindowTextConsole {
                 }
             });
         }
+    }
+
+    public void setInformationObject(InformationObject informationObject) {
+        this.outputConsole.setInformationObject(informationObject);
     }
 }

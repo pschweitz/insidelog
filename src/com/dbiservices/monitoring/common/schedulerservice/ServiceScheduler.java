@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.dbiservices.monitoring.common.schedulerservice;
 
 /**
  *
- * @author  Philippe Schweitzer
+ * @author Philippe Schweitzer
  * @version 1.1
- * @since   16.11.2015
+ * @since 16.11.2015
  */
-
+import com.dbiservices.monitoring.tail.TailSSH;
+import com.dbiservices.tools.ApplicationContext;
 import com.dbiservices.tools.Logger;
 import java.util.Hashtable;
 
@@ -41,9 +41,18 @@ public class ServiceScheduler {
 
     public static void addScheduledDefinition(String fullName, ScheduledDefinition scheduledDefinition) {
         logger.trace("addScheduledDefinition: " + fullName);
-        scheduledDefinition.refreshWindowConfiguration();
-        logger.info("Start read of file: " + scheduledDefinition.getDisplayName());
-        scheduledDefinitionPool.put(fullName, scheduledDefinition);
+        // scheduledDefinition.refreshWindowConfiguration();
+        scheduledDefinition.setEnabled(true);
+        boolean success = true;
+
+        if (TailSSH.class.isAssignableFrom(scheduledDefinition.getiScheduledService().getClass())) {
+            success = ((TailSSH) scheduledDefinition.getiScheduledService()).connect();
+        }
+
+        if (success) {
+            logger.info("Start read of file: " + scheduledDefinition.getDisplayName());
+            scheduledDefinitionPool.put(fullName, scheduledDefinition);
+        }
     }
 
     public static void removeScheduledDefinition(String fullName) {
@@ -51,12 +60,17 @@ public class ServiceScheduler {
         logger.trace("removeScheduledDefinition: " + fullName);
         if (scheduledDefinitionPool.containsKey(fullName)) {
             logger.info("Stop read of file: " + scheduledDefinitionPool.get(fullName).getDisplayName());
+            
+            if (scheduledDefinitionPool.get(fullName).getiScheduledService().getInformationObject().getWindowTextConsole() != null) {
+                scheduledDefinitionPool.get(fullName).getiScheduledService().getInformationObject().getWindowTextConsole().setIsRunning(false);
+            }
+            
             scheduledDefinitionPool.get(fullName).setEnabled(false);
             scheduledDefinitionPool.remove(fullName);
         }
     }
 
-    public ScheduledDefinition getScheduledDefinition(String fullName) {
+    public static ScheduledDefinition getScheduledDefinition(String fullName) {
         if (scheduledDefinitionPool.containsKey(fullName)) {
             return scheduledDefinitionPool.get(fullName);
         } else {

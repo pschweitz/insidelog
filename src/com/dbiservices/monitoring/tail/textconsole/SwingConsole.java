@@ -92,18 +92,22 @@ public class SwingConsole extends StackPane implements IOutputConsole {
 
     public static String lineSeparator = System.getProperty("line.separator");
 
-    private static Font font2 = new Font("SansSerif", Font.BOLD, 8);
+   // private Font font;
 
-    private ColorConfiguration colorConfiguration;
+  //  private ColorConfiguration colorConfiguration;
 
     private boolean bufferOverflow = false;
 
     private int insertCount = 0;
+    
+    private InformationObject informationObject;
 
-    public SwingConsole(ColorConfiguration colorConfiguration) {
+    public SwingConsole(InformationObject informationObject) {
+    //public SwingConsole(ColorConfiguration colorConfiguration) {
         super();
 
-        this.colorConfiguration = colorConfiguration;
+        this.informationObject = informationObject;
+   //     this.colorConfiguration = colorConfiguration;
         doc = new DefaultStyledDocument();
         textPane.setDocument(doc);
 
@@ -123,12 +127,12 @@ public class SwingConsole extends StackPane implements IOutputConsole {
             textPane.putClientProperty("Nimbus.Overrides", tdef);
         }
 
-        logger.trace("BackgroundSwingColor: " + colorConfiguration.getBackgroundSwingColor());
+        logger.trace("BackgroundSwingColor: " + informationObject.getColorConfiguration().getBackgroundSwingColor());
 
-        textPane.setBackground(colorConfiguration.getBackgroundSwingColor());
+        textPane.setBackground(informationObject.getColorConfiguration().getBackgroundSwingColor());
 
-        logger.trace("SelectionSwingColor: " + colorConfiguration.getSelectionSwingColor());
-        textPane.setSelectionColor(colorConfiguration.getSelectionSwingColor());
+        logger.trace("SelectionSwingColor: " + informationObject.getColorConfiguration().getSelectionSwingColor());
+        textPane.setSelectionColor(informationObject.getColorConfiguration().getSelectionSwingColor());
 
         scrollPane.setViewportView(textPane);
 
@@ -181,6 +185,8 @@ public class SwingConsole extends StackPane implements IOutputConsole {
                     StyleContext sc = new StyleContext();
                     Style style = sc.addStyle(null, null);
                     StyleConstants.setForeground(style, color);
+                    StyleConstants.setFontFamily(style, informationObject.getColorConfiguration().fontName);
+                    StyleConstants.setFontSize(style, informationObject.getColorConfiguration().fontSize);
 
                     doc.insertString(doc.getLength(), message, style);
 
@@ -242,16 +248,18 @@ public class SwingConsole extends StackPane implements IOutputConsole {
                     Color color;
                     StyleContext sc = new StyleContext();
                     Style style = sc.addStyle(null, null);
+                    StyleConstants.setFontFamily(style, informationObject.getColorConfiguration().fontName);
+                    StyleConstants.setFontSize(style, informationObject.getColorConfiguration().fontSize);
 
                     if (informationObject.isDisplayColors()) {
                         StringTokenizer contentTokens = new StringTokenizer(content, System.lineSeparator());
                         while (contentTokens.hasMoreElements()) {
                             String token = contentTokens.nextToken();
 
-                            ArrayList<PatternColorConfiguration> colorConfigurationList = colorConfiguration.getColorConfigurationList();
+                            ArrayList<PatternColorConfiguration> colorConfigurationList = informationObject.getColorConfiguration().getColorConfigurationList();
 
                             if (token != null && !token.equals("")) {
-                                color = colorConfiguration.getDefaultSwingColor();
+                                color = informationObject.getColorConfiguration().getDefaultSwingColor();
 
                                 for (int i = 0; i < colorConfigurationList.size(); i++) {
                                     PatternColorConfiguration patternColorConfiguration = colorConfigurationList.get(i);
@@ -403,7 +411,7 @@ public class SwingConsole extends StackPane implements IOutputConsole {
 
             String rtfString = out.toString();
 
-            Color backgroudColor = colorConfiguration.getBackgroundSwingColor();
+            Color backgroudColor = informationObject.getColorConfiguration().getBackgroundSwingColor();
 
             int backgroudColorInt = backgroudColor.getRGB();
 
@@ -500,6 +508,12 @@ public class SwingConsole extends StackPane implements IOutputConsole {
         }
     }
 
+    @Override
+ 
+    public void setInformationObject(InformationObject informationObject){
+        this.informationObject = informationObject;
+    }
+
     static class DataTransferClass implements Transferable {
 
         private Object datatrans[];
@@ -540,7 +554,7 @@ public class SwingConsole extends StackPane implements IOutputConsole {
         DefaultHighlighter highlighter = (DefaultHighlighter) textPane.getHighlighter();
         highlighter.removeAllHighlights();
         if (!text.equals("")) {
-            DefaultHighlightPainter hPainter = new DefaultHighlightPainter(colorConfiguration.getSearchSwingColor());
+            DefaultHighlightPainter hPainter = new DefaultHighlightPainter(informationObject.getColorConfiguration().getSearchSwingColor());
             String contText = "";
 
             try {
@@ -577,7 +591,7 @@ public class SwingConsole extends StackPane implements IOutputConsole {
         Double zoomFactor = getZoomFactor();
 
         textPane.getDocument().putProperty("ZOOM_FACTOR", zoomFactor * 1.1);
-        logger.debug("zoom IN: factor:" + getZoomFactor());
+        logger.trace("zoom IN: factor:" + getZoomFactor());
 
         textPane.repaint();
         int newMaxV = (int) (scrollPane.getVerticalScrollBar().getMaximum() * 1.1);
@@ -595,7 +609,7 @@ public class SwingConsole extends StackPane implements IOutputConsole {
 
         int maxV = scrollPane.getHorizontalScrollBar().getMaximum();
 
-        logger.debug("zoom OUT: factor:" + getZoomFactor());
+        logger.trace("zoom OUT: factor:" + getZoomFactor());
         textPane.repaint();
         scrollPane.getHorizontalScrollBar().setMaximum((int) (maxV * 1 / 1.1));
         scrollPane.repaint();
@@ -611,7 +625,7 @@ public class SwingConsole extends StackPane implements IOutputConsole {
         textPane.getDocument().putProperty("ZOOM_FACTOR", zoomFactor);
         textPane.getDocument().putProperty("i18n", Boolean.TRUE);
 
-        logger.debug("zoom Reset: factor:" + getZoomFactor());
+        logger.trace("zoom Reset: factor:" + getZoomFactor());
         textPane.repaint();
         scrollPane.repaint();
 

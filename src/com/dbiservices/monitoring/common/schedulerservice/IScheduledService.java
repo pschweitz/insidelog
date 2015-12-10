@@ -16,12 +16,17 @@
 
 package com.dbiservices.monitoring.common.schedulerservice;
 
+import com.dbiservices.monitoring.tail.InformationObject;
+
+
 /**
  *
  * @author  Philippe Schweitzer
  * @version 1.1
  * @since   16.11.2015
  */
-public interface IScheduledService {
+public interface IScheduledService{
     public void ScheduledAction();
+    public void setEnabled(boolean isEnabled);
+    public InformationObject getInformationObject();
 }
