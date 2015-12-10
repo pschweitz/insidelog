@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.dbiservices.monitoring.common.schedulerservice;
 
 /**
  *
- * @author  Philippe Schweitzer
+ * @author Philippe Schweitzer
  * @version 1.1
- * @since   16.11.2015
+ * @since 16.11.2015
  */
-
 import com.dbiservices.monitoring.tail.ColorConfiguration;
+import com.dbiservices.monitoring.tail.DbiTail;
 import com.dbiservices.monitoring.tail.InformationObject;
 import com.dbiservices.tools.ApplicationContext;
 import com.dbiservices.tools.Logger;
@@ -32,8 +31,8 @@ import java.nio.file.Paths;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class ScheduledDefinition{
-    
+public class ScheduledDefinition {
+
     private static final Logger logger = Logger.getLogger(ScheduledDefinition.class);
 
     private String fullName;
@@ -45,36 +44,46 @@ public class ScheduledDefinition{
     private Task task = new Task();
     private boolean isEnabled;
     private InformationObject informationObject;
-    
+
     public ScheduledDefinition(InformationObject informationObject, IScheduledService iScheduledService) {
         this.fullName = informationObject.getFullName();
         this.displayName = informationObject.getDisplayName();
         this.iScheduledService = iScheduledService;
         this.executionType = informationObject.getScheduleType();
         this.waitMS = informationObject.getFrequency();
-        this.timer = new Timer();  
+        this.timer = new Timer();
         this.informationObject = informationObject;
         this.setEnabled(true);
-        
-        if(executionType == ServiceScheduler.REGULAR){
+
+        if (executionType == ServiceScheduler.REGULAR) {
             timer.scheduleAtFixedRate(task, waitMS, waitMS);
-        }
-        else if(executionType == ServiceScheduler.MATURITY){
+        } else if (executionType == ServiceScheduler.MATURITY) {
             timer.schedule(task, waitMS);
         }
     }
-    
-    public void refreshWindowConfiguration(){
+
+    /*
+    public void refreshWindowConfiguration() {
         logger.info("informationObject.getFileColors(): " + informationObject.getFileColors());
-                
-        if(informationObject.getFileColors().equals("etc/color.cfg")){
-            informationObject.setColorConfiguration( (ColorConfiguration) ApplicationContext.getInstance().get("colorDefaultConfiguration"));
-        }
-        else{
-            if(!Files.exists(Paths.get(informationObject.getFileColors()))){
-                informationObject.setColorConfiguration(new ColorConfiguration("etc/color.cfg"));
+
+        if (informationObject.getFileColors().equals(DbiTail.colorFileName) {
+            informationObject.setColorConfiguration((ColorConfiguration) ApplicationContext.getInstance().get("colorDefaultConfiguration"));
+        } else {
+            if (!Files.exists(Paths.get(informationObject.getFileColors()))) {
+                informationObject.setColorConfiguration(new ColorConfiguration(DbiTail.colorFileName);
             }
         }
+    }
+
+    public void refreshWindowConfiguration(ColorConfiguration colorConfiguration) {
+        logger.info("informationObject.getFileColors(): " + informationObject.getFileColors());
+
+        informationObject.setColorConfiguration(colorConfiguration);
+    }
+    */
+
+    public IScheduledService getiScheduledService() {
+        return iScheduledService;
     }
 
     public boolean isEnabled() {
@@ -83,20 +92,28 @@ public class ScheduledDefinition{
 
     public void setEnabled(boolean isEnabled) {
         this.isEnabled = isEnabled;
+
+        //if (!isEnabled) {
+        iScheduledService.setEnabled(isEnabled);
+        //}
+
     }
 
+    public InformationObject getInformationObject() {
+        return informationObject;
+    }    
+    
     public String getDisplayName() {
         return displayName;
     }
-    
+
     private class Task extends TimerTask {
+
         @Override
-        public void run()
-        {
-            if (isEnabled())
-            {
+        public void run() {
+            if (isEnabled()) {
                 iScheduledService.ScheduledAction();
-            } else if(!isEnabled() || executionType == ServiceScheduler.MATURITY) {
+            } else if (!isEnabled() || executionType == ServiceScheduler.MATURITY) {
                 timer.cancel();
             }
         }

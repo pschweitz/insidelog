@@ -49,5 +49,5 @@ BEAWARE:
 
 Run of DBI Tail on a production server is at your own risks. 
 If you want to view log files from there, it is recommended 
-to open a Read-Only shared folder over the network. 
+to open a Read-Only shared folder over the network, or use SSH. 
 

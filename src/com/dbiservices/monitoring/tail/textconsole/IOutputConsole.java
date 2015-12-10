@@ -23,6 +23,7 @@ package com.dbiservices.monitoring.tail.textconsole;
  * @since   16.11.2015
  */
 
+import com.dbiservices.monitoring.tail.ColorConfiguration;
 import com.dbiservices.monitoring.tail.InformationObject;
 
 public interface IOutputConsole {
@@ -37,5 +38,6 @@ public interface IOutputConsole {
     public void search(String text, boolean caseSensitive); 
     public void zoomIn();    
     public void zoomOut();   
-    public void zoomReset();    
+    public void zoomReset();       
+    public void setInformationObject(InformationObject informationObject);
 }

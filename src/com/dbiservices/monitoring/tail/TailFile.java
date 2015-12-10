@@ -23,80 +23,37 @@ package com.dbiservices.monitoring.tail;
  */
 import com.dbiservices.monitoring.common.schedulerservice.IScheduledService;
 import com.dbiservices.tools.Logger;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.SortedMap;
+import java.util.logging.Level;
 import org.mozilla.universalchardet.UniversalDetector;
 
-public class Tail implements IScheduledService, Serializable {
+public class TailFile implements IScheduledService, Serializable {
 
-    private static final Logger logger = Logger.getLogger(Tail.class);
+    private static final Logger logger = Logger.getLogger(TailFile.class);
 
     private InformationObject informationObject;
 
-    private boolean running = false;
-
-    public Tail(InformationObject informationObject) {
+    public TailFile(InformationObject informationObject) {
         this.informationObject = informationObject;
     }
 
+    @Override
     public void ScheduledAction() {
-
         parseFile();
-    }
-
-    private Charset detectCharset(File file) {
-
-        Charset result = StandardCharsets.US_ASCII;
-        byte[] buf = new byte[4096];
-
-        SortedMap<String, Charset> charsetMap = Charset.availableCharsets();
-
-        FileInputStream fstream = null;
-        try {
-            fstream = new FileInputStream(file);
-
-            UniversalDetector detector = new UniversalDetector(null);
-
-            int nread;
-            while ((nread = fstream.read(buf)) > 0 && !detector.isDone()) {
-                detector.handleData(buf, 0, nread);
-            }
-
-            detector.dataEnd();
-
-            String encoding = detector.getDetectedCharset();
-            if (encoding != null) {
-                logger.info("Detected encoding = " + encoding);
-
-                if (charsetMap.containsKey(encoding.toUpperCase())) {
-
-                    logger.info("Detected encoding in supported list !");
-                    result = charsetMap.get(encoding.toUpperCase());
-
-                }
-            } else {
-                logger.warning("No encoding detected. Using default: " + result.name());
-            }
-
-            detector.reset();
-            fstream.close();
-
-        } catch (Exception e) {
-        } finally {
-            try {
-                fstream.close();
-            } catch (Exception ex) {
-            }
-        }
-
-        return result;
     }
 
     public void parseFile() {
@@ -112,17 +69,27 @@ public class Tail implements IScheduledService, Serializable {
             bufferSize = 100;
         }
 
-        if (charset == null) {
-            charset = detectCharset(file);
-            informationObject.setCharset(charset);
-        }
-
         StringBuilder stringBuider = new StringBuilder();
 
         try {
-            FileInputStream fstream = new FileInputStream(file);
+            FileInputStream fstream;
+            CharsetDetect charsetDetect = null;
 
-            InputStreamReader is = new InputStreamReader(fstream, charset);
+            InputStreamReader is = null;
+
+            if (charset == null) {
+                fstream = new FileInputStream(file);
+                charsetDetect = new CharsetDetect(fstream, null, informationObject, 1048576 ); // 1Mo of check
+                charsetDetect.start();
+                try {
+                    charsetDetect.join();
+                    charset = charsetDetect.charset;
+                } catch (InterruptedException ex) {
+                }
+
+            }
+            fstream = new FileInputStream(file);
+            is = new InputStreamReader(fstream, charset);
 
             br = new BufferedReader(is);
 
@@ -137,7 +104,10 @@ public class Tail implements IScheduledService, Serializable {
                     br.skip(offset);
                 }
             }
+
+            //         logger.debug("OFF offset: " + offset);
             String line = "";
+
             int counter = 0;
 
             while (line != null) {
@@ -159,6 +129,7 @@ public class Tail implements IScheduledService, Serializable {
                     stringBuider = new StringBuilder();
                     counter = 0;
                 }
+
                 line = br.readLine();
             }
 
@@ -203,4 +174,7 @@ public class Tail implements IScheduledService, Serializable {
         this.informationObject = informationObject;
     }
 
+    @Override
+    public void setEnabled(boolean isEnabled) {
+    }
 }

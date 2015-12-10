@@ -23,6 +23,7 @@ package com.dbiservices.monitoring.tail;
  * @since   16.11.2015
  */
 
+import com.dbiservices.tools.ApplicationContext;
 import com.dbiservices.tools.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -36,7 +37,7 @@ public class ColorChooserWindow extends Application {
 
     private final InformationObject informationObject;
 
-    private String fileColors = "etc/color.cfg";
+    private String fileColors = DbiTail.colorFileName;
 
     public ColorChooserWindow(InformationObject informationObject, String fileColors) {
         this.informationObject = informationObject;
@@ -59,9 +60,9 @@ public class ColorChooserWindow extends Application {
 
             Parent root = loader.load();
 
-            Scene scene = new Scene(root, 650, 300);
+            Scene scene = new Scene(root, 663, 365);
 
-            primaryStage.setTitle("Color chooser");
+            primaryStage.setTitle("Color chooser - " + informationObject.getFullName());
             primaryStage.setScene(scene);
             primaryStage.setResizable(false);
             primaryStage.show();

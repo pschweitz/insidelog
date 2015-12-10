@@ -24,6 +24,7 @@ package com.dbiservices.monitoring.tail;
 import com.dbiservices.tools.ApplicationContext;
 import com.dbiservices.tools.Logger;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -47,6 +48,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TableCell;
@@ -57,6 +59,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -77,6 +80,15 @@ public class ColorChooserWindowControler implements Initializable {
     private TextField patternText;
 
     @FXML
+    private ChoiceBox templateName;
+
+    @FXML
+    private ChoiceBox fontName;
+
+    @FXML
+    private TextField fontSize;
+
+    @FXML
     private ColorPicker patternColor;
     @FXML
     private ColorPicker defaultColor;
@@ -94,6 +106,8 @@ public class ColorChooserWindowControler implements Initializable {
     @FXML
     private Button saveButton;
     @FXML
+    private Button saveAsButton;
+    @FXML
     private Button cancelButton;
     @FXML
     private Button upButton;
@@ -103,9 +117,10 @@ public class ColorChooserWindowControler implements Initializable {
     private ObservableList<PatternColorConfiguration> data;
     private Stage colorChooserWindowStage;
     private ColorConfiguration colorConfiguration;
+    private ColorConfiguration colorConfigurationEdit;
     private InformationObject informationObject;
 
-    private String fileColors = "etc/color.cfg";
+    private String fileColors = DbiTail.colorFileName;
 
     public ColorChooserWindowControler(InformationObject informationObject, String fileColors, Stage colorChooserWindowStage) {
 
@@ -115,12 +130,12 @@ public class ColorChooserWindowControler implements Initializable {
         } else {
             this.colorConfiguration = (ColorConfiguration) ApplicationContext.getInstance().get("colorDefaultConfiguration");
         }
-        
-        if(this.colorConfiguration == null){
+
+        if (this.colorConfiguration == null) {
             this.colorConfiguration = (ColorConfiguration) ApplicationContext.getInstance().get("colorDefaultConfiguration");
             logger.error("colorDefaultConfiguration: " + colorConfiguration);
-        }                
-        
+        }
+
         this.colorChooserWindowStage = colorChooserWindowStage;
         this.fileColors = fileColors;
     }
@@ -128,9 +143,41 @@ public class ColorChooserWindowControler implements Initializable {
     @FXML
     private void saveButtonAction(ActionEvent event) {
 
+        fileColors = "etc/" + this.templateName.getSelectionModel().getSelectedItem();
+        fireSave();
+    }
+
+    @FXML
+    private void saveAsButtonAction(ActionEvent event) {
+
+        FileChooser fileChooser = new FileChooser();
+
+        Path etcFolder = Paths.get("etc");
+
+        fileChooser.setInitialDirectory(etcFolder.toFile());
+        fileChooser.setTitle("Save Color Template");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Color Configuration", "*.cfg")
+        );
+
+        File file = fileChooser.showSaveDialog(this.colorChooserWindowStage);
+
+        logger.debug("file.getPath(): " + file.getPath());
+        logger.debug("Paths.get(file.getPath()): " + Paths.get(file.getPath()));
+
+        Path relative = Paths.get(etcFolder.toFile().getAbsolutePath()).relativize(Paths.get(file.getAbsolutePath()));
+
+        logger.debug("file: etc/" + relative);
+
+        fileColors = "etc/" + relative;
+
+        fireSave();
+    }
+
+    private void fireSave() {
         ApplicationContext applicationContext = ApplicationContext.getInstance();
 
-        if (fileColors.equals("etc/color.cfg") && informationObject.getFilePath().toString().equals(".")) {
+        if (fileColors.equals(DbiTail.colorFileName) && informationObject.getFilePath().toString().equals(".")) {
             if (applicationContext.containsKey("colorDefaultConfiguration")) {
                 applicationContext.remove("colorDefaultConfiguration");
             }
@@ -151,12 +198,22 @@ public class ColorChooserWindowControler implements Initializable {
 
         colorConfiguration.setColorConfigurationList(colorConfigurationList);
 
-        String oldFileColorsName = new String(fileColors);
+        colorConfiguration.fontName = (String) this.fontName.getSelectionModel().getSelectedItem();
+        try {
+            colorConfiguration.fontSize = Integer.parseInt(this.fontSize.getText());
+        } catch (Exception e) {
+            colorConfiguration.fontSize = 8;
+        }
 
-        if (fileColors.equals("etc/color.cfg") && informationObject.getFilePath().toString().equals(".")) {
-            applicationContext.put("colorDefaultConfiguration", colorConfiguration);
+        colorConfiguration.templateName = fileColors.substring("etc/".length());
+
+        logger.debug("\"etc/\" + colorConfigurationEdit.templateName: " + "etc/" + colorConfigurationEdit.templateName);
+        logger.debug("DbiTail.colorFileName: " + DbiTail.colorFileName);
+        logger.debug("informationObject.getFilePath().toString().equals(\".\"): " + informationObject.getFilePath().toString().equals("."));
+        
+        if (fileColors.equals(DbiTail.colorFileName) && informationObject.getFilePath().toString().equals(".")) {
+            applicationContext.put("colorDefaultConfiguration", colorConfiguration);   
         } else {
-            fileColors = "etc/" + UUID.randomUUID().toString() + ".cfg";
             informationObject.setFileColors(fileColors);
         }
 
@@ -165,15 +222,17 @@ public class ColorChooserWindowControler implements Initializable {
         informationObject.setColorConfiguration(colorConfiguration);
 
         DbiTail.saveTreeToFile();
+        DbiTail.updateInformationObjetcs(colorConfiguration);
 
-        try {
-            if (!oldFileColorsName.equals("etc/color.cfg")) {
-                Files.delete(Paths.get(oldFileColorsName));
-            }
-        } catch (IOException ex) {
-            logger.error("Error deleting file: " + oldFileColorsName, ex);
-        }
-
+        /*
+         try {
+         if (!oldFileColorsName.equals(DbiTail.colorFileName) {
+         Files.delete(Paths.get(oldFileColorsName));
+         }
+         } catch (IOException ex) {
+         logger.error("Error deleting file: " + oldFileColorsName, ex);
+         }
+         */
         colorChooserWindowStage.close();
     }
 
@@ -198,7 +257,7 @@ public class ColorChooserWindowControler implements Initializable {
         }
 
         try {
-            bw_colorView.write("\"" + colorConfiguration.getBackgroundColor().toString() + "\";\"" + colorConfiguration.getDefaultColor().toString() + "\";\"" + colorConfiguration.getSelectionColor().toString() + "\";\"" + colorConfiguration.getSearchColor().toString() + "\"");
+            bw_colorView.write("\"" + colorConfiguration.getBackgroundColor().toString() + "\";\"" + colorConfiguration.getDefaultColor().toString() + "\";\"" + colorConfiguration.getSelectionColor().toString() + "\";\"" + colorConfiguration.getSearchColor().toString() + "\";\"" + colorConfiguration.fontName + "\";\"" + colorConfiguration.fontSize + "\"");
             bw_colorView.newLine();
             bw_colorView.flush();
         } catch (IOException e) {
@@ -359,6 +418,74 @@ public class ColorChooserWindowControler implements Initializable {
             }
         });
 
+        colorConfigurationEdit = new ColorConfiguration("etc/" + colorConfiguration.templateName);
+        data = FXCollections.observableArrayList(colorConfigurationEdit.colorConfigurationList);
+        colorTable.setItems(data);
+
+        patternColor.setValue(colorConfiguration.defaultColor);
+        defaultColor.setValue(colorConfiguration.defaultColor);
+        backgroundColor.setValue(colorConfiguration.backgroundColor);
+        selectionColor.setValue(colorConfiguration.selectionColor);
+        searchColor.setValue(colorConfiguration.searchColor);
+
+        String[] fontNames = {"SansSerif", "Monospaced"};
+
+        fontName.setItems(FXCollections.observableArrayList(fontNames));
+
+        int selectedIndex = 0;
+        for (String item : (ObservableList<String>) fontName.getItems()) {
+
+            if (item.equals(colorConfiguration.fontName)) {
+                break;
+            }
+            selectedIndex++;
+        }
+
+        if (selectedIndex >= fontName.getItems().size()) {
+            selectedIndex = 0;
+        }
+
+        fontName.getSelectionModel().select(selectedIndex);
+        
+        ArrayList<String> fileList = new ArrayList();
+        DbiTail.getConfigurationFileList(Paths.get("etc").toFile(), fileList);
+
+        templateName.setItems(FXCollections.observableArrayList(fileList));
+        int selectedIndexFile = 0;
+        for (String item : (ObservableList<String>) templateName.getItems()) {
+
+            if (item.equals(colorConfiguration.templateName)) {
+                break;
+            }
+            selectedIndexFile++;
+        }
+
+        if (selectedIndexFile >= templateName.getItems().size()) {
+
+            // put index of default;
+            selectedIndexFile = 0;
+        }
+
+        templateName.getSelectionModel().select(selectedIndexFile);
+
+        templateName.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue ov, Number value, Number new_value) {
+                
+                logger.debug("Selected color configuration: " + "etc/" + templateName.getItems().get((int) new_value));
+                
+                colorConfiguration = new ColorConfiguration("etc/" + templateName.getItems().get((int) new_value));
+                updateUI();
+            }
+        });
+
+        fontSize.setText(String.valueOf(colorConfiguration.fontSize));
+
+        upButton.setGraphic(new ImageView(new Image("arrow-up.png")));
+        downButton.setGraphic(new ImageView(new Image("arrow-down.png")));
+    }
+    
+    private void updateUI(){
+        
         data = FXCollections.observableArrayList(colorConfiguration.colorConfigurationList);
         colorTable.setItems(data);
 
@@ -368,8 +495,22 @@ public class ColorChooserWindowControler implements Initializable {
         selectionColor.setValue(colorConfiguration.selectionColor);
         searchColor.setValue(colorConfiguration.searchColor);
 
-        upButton.setGraphic(new ImageView(new Image("arrow-up.png")));
-        downButton.setGraphic(new ImageView(new Image("arrow-down.png")));
+        String[] fontNames = {"SansSerif", "Monospaced"};
+
+        int selectedIndex = 0;
+        for (String item : (ObservableList<String>) fontName.getItems()) {
+
+            if (item.equals(colorConfiguration.fontName)) {
+                break;
+            }
+            selectedIndex++;
+        }
+
+        if (selectedIndex > fontNames.length) {
+            selectedIndex = 0;
+        }
+        
+        fontSize.setText(String.valueOf(colorConfiguration.fontSize));
     }
 
     public class CheckboxCell<T> extends TableCell<PatternColorConfiguration, Boolean> {

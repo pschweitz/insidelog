@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.dbiservices.monitoring.tail;
 
 /**
  *
- * @author  Philippe Schweitzer
+ * @author Philippe Schweitzer
  * @version 1.1
- * @since   16.11.2015
+ * @since 16.11.2015
  */
-
 import com.dbiservices.monitoring.common.schedulerservice.ScheduledDefinition;
 import com.dbiservices.tools.ApplicationContext;
 import com.dbiservices.tools.Logger;
@@ -50,6 +48,10 @@ public class ColorConfiguration {
     public Color selectionColor;
     public Color searchColor;
 
+    public String templateName;
+    public String fontName;
+    public int fontSize;
+
     public ArrayList<PatternColorConfiguration> colorConfigurationList;
 
     public ColorConfiguration() {
@@ -61,7 +63,7 @@ public class ColorConfiguration {
         colorConfigurationList = new ArrayList();
 
         if (!Files.exists(Paths.get(colorFileName))) {
-            colorFileName = "etc/color.cfg";
+            colorFileName = DbiTail.colorFileName;
         }
 
         if (Files.exists(Paths.get(colorFileName))) {
@@ -82,6 +84,8 @@ public class ColorConfiguration {
                 String defaultColorString = null;
                 String selectionColorString = null;
                 String searchColorString = null;
+                String fontNameString = null;
+                String fontSizeString = null;
                 String paternString = null;
                 String paternColor = null;
                 String paternCase = "false";
@@ -122,6 +126,16 @@ public class ColorConfiguration {
                                         searchColorString = token;
                                         break;
 
+                                    case 4:
+
+                                        fontNameString = token;
+                                        break;
+
+                                    case 5:
+
+                                        fontSizeString = token;
+                                        break;
+
                                 }
                             } else {
                                 switch (columnCounter) {
@@ -150,7 +164,15 @@ public class ColorConfiguration {
                             backgroundColor = Color.valueOf(backgroudColorString);
                             defaultColor = Color.valueOf(defaultColorString);
                             selectionColor = Color.valueOf(selectionColorString);
-                            searchColor = Color.valueOf(searchColorString);
+                            searchColor = Color.valueOf(searchColorString);                            
+                            
+                            fontName = fontNameString;
+                            try {
+                                fontSize = Integer.valueOf(fontSizeString);
+                            } catch (Exception e) {
+                                fontSize = 8;
+                            }
+
                         } else {
                             colorConfigurationList.add(new PatternColorConfiguration(paternString, Color.valueOf(paternColor), Boolean.parseBoolean(paternCase)));
                         }
@@ -171,6 +193,8 @@ public class ColorConfiguration {
             defaultColor = Color.LIGHTGREY;
             selectionColor = Color.valueOf("#BBD2E1");
             searchColor = Color.MAGENTA;
+            fontName = "SansSerif";
+            fontSize = 8;
 
             colorConfigurationList.add(new PatternColorConfiguration("error", Color.valueOf("#FF7402"), false));
             colorConfigurationList.add(new PatternColorConfiguration("warn", Color.ORANGE, false));
@@ -178,7 +202,7 @@ public class ColorConfiguration {
             colorConfigurationList.add(new PatternColorConfiguration("debug", Color.LIGHTGREY, false));
         }
 
-        if (colorFileName.equals("etc/color.cfg")) {
+        if (colorFileName.equals(DbiTail.colorFileName)) {
 
             ApplicationContext applicationContext = ApplicationContext.getInstance();
 
@@ -188,6 +212,7 @@ public class ColorConfiguration {
             }
         }
 
+        this.templateName = colorFileName.substring("etc/".length());
     }
 
     public Color getSelectionColor() {
@@ -247,11 +272,11 @@ public class ColorConfiguration {
     }
 
     public static java.awt.Color getSwingColor(Color c) {
-        
+
         int r = (int) (c.getRed() * 255);
         int g = (int) (c.getGreen() * 255);
         int b = (int) (c.getBlue() * 255);
-        
+
         int rgb = (r << 16) + (g << 8) + b;
 
         return new java.awt.Color(rgb);

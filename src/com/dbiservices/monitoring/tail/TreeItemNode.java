@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.dbiservices.monitoring.tail;
 
 /**
  *
- * @author  Philippe Schweitzer
+ * @author Philippe Schweitzer
  * @version 1.1
- * @since   16.11.2015
+ * @since 16.11.2015
  */
-
+import com.dbiservices.monitoring.common.schedulerservice.IScheduledService;
 import com.dbiservices.monitoring.common.schedulerservice.ScheduledDefinition;
 import com.dbiservices.monitoring.common.schedulerservice.ServiceScheduler;
 import com.dbiservices.tools.ApplicationContext;
@@ -45,7 +44,7 @@ public class TreeItemNode extends TreeItem<String> implements Serializable {
 
     private boolean isNode = false;
     private InformationObject informationObject;
-    private Tail tailThread;
+    private IScheduledService tailThread;
 
     public TreeItemNode() {
         super();
@@ -65,7 +64,11 @@ public class TreeItemNode extends TreeItem<String> implements Serializable {
         this.informationObject = informationObject;
         this.isNode = isNode;
 
-        tailThread = new Tail(informationObject);
+        if (informationObject.getFilePath().toLowerCase().startsWith("ssh://")) {
+            tailThread = new TailSSH(informationObject);
+        } else {
+            tailThread = new TailFile(informationObject);
+        }
     }
 
     public static TreeItemNode createSubGroups(TreeView<String> treeView, String fullName) {
@@ -184,6 +187,33 @@ public class TreeItemNode extends TreeItem<String> implements Serializable {
         }
     }
 
+    public static void refreshColorConfiguration(TreeItemNode treeItemNode, ColorConfiguration colorConfiguration) {
+
+        
+                
+        if (((TreeItemNode) treeItemNode).isFile()) {
+
+                logger.debug("treeItemNode: " + treeItemNode.informationObject.getDisplayName());
+            if (treeItemNode.informationObject.getColorConfiguration().templateName.equals(colorConfiguration.templateName)
+                    && ! treeItemNode.informationObject.getColorConfiguration().templateName.equals(DbiTail.colorFileName)) {
+                
+                logger.debug("refresh color configuration: " + treeItemNode.informationObject.getDisplayName());
+                
+                treeItemNode.informationObject.setColorConfiguration(colorConfiguration);
+       //         ServiceScheduler.getScheduledDefinition(treeItemNode.informationObject.getFullName()).refreshWindowConfiguration(colorConfiguration);
+            }
+
+        } else {
+            ObservableList<TreeItem<String>> children = treeItemNode.getChildren();
+
+            for (TreeItem<String> child : children) {
+                //if (((TreeItemNode) child).isNode) {
+                    refreshColorConfiguration((TreeItemNode) child, colorConfiguration);
+                //}
+            }
+        }
+    }
+
     public void removeNode(TreeView<String> treeView) {
 
         if (this.getParent() != null) {
@@ -197,13 +227,13 @@ public class TreeItemNode extends TreeItem<String> implements Serializable {
             getRecursiveLeaf((TreeItemNode) this, nodes);
 
             for (TreeItemNode node : nodes) {
-                node.stopTailSchedule();
+                //node.stopTailSchedule();
 
                 if (ApplicationContext.getInstance().containsKey(node.getInformationObject().getFullName())) {
                     WindowTextConsole textComsole = (WindowTextConsole) ApplicationContext.getInstance().get(node.getInformationObject().getFullName());
-                    textComsole.clear();
+                    //textComsole.clear();
                 }
-                node.hideTextconsole();
+                //node.hideTextconsole();
             }
         }
     }
@@ -229,7 +259,7 @@ public class TreeItemNode extends TreeItem<String> implements Serializable {
 
         if (this.getParent() != null) {
             TreeItemNode parent = (TreeItemNode) this.getParent();
-            
+
             this.removeNode(treeView);
             parent.addNode(this, treeView);
 
@@ -240,7 +270,9 @@ public class TreeItemNode extends TreeItem<String> implements Serializable {
             for (TreeItemNode node : nodes) {
                 String fullname = getFullPath(node);
                 node.getInformationObject().setFullName(fullname);
-                node.getInformationObject().getWindowTextConsole().setName(fullname);
+                if (node.getInformationObject().getWindowTextConsole() != null) {                    
+                    node.getInformationObject().getWindowTextConsole().setName(fullname);
+                }
             }
         }
         return true;
@@ -257,7 +289,7 @@ public class TreeItemNode extends TreeItem<String> implements Serializable {
             if (name.compareTo(treeItem.getValue()) == 0) {
                 return false;
             }
-        }        
+        }
         return result;
     }
 
@@ -346,9 +378,9 @@ public class TreeItemNode extends TreeItem<String> implements Serializable {
         newNode.expandedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                
+
                 BooleanProperty bb = (BooleanProperty) observable;
-                
+
                 TreeItem t = (TreeItem) bb.getBean();
 
                 if (t.getParent() != null && ((TreeItemNode) t).isNode()) {
