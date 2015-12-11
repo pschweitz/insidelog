@@ -1628,13 +1628,11 @@ public class DbiTail extends Application {
 
         // get all the files from a directory
         File[] fList = directory.listFiles();
-        if (fList != null) {
-            for (File file : fList) {
-                if (file.isFile() && file.getName().endsWith(".cfg")) {
-                    files.add(file.getName());
-                } else if (file.isDirectory()) {
-                    getConfigurationFileList(file, files);
-                }
+        for (File file : fList) {
+            if (file.isFile() && file.getName().endsWith(".cfg")) {
+                files.add(file.getName());
+            } else if (file.isDirectory()) {
+                getConfigurationFileList(file, files);
             }
         }
     }
