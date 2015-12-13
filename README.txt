@@ -41,7 +41,7 @@ If you experience some troubles or slowdowns, it is advised to setup Java max he
 
      -> Just use dbiTail.bat or dbitail.sh
      -> Or create a shortcut and fill-in/adapt following properties to your environment:
-              Target : C:\<path to java>\javaw.exe -Xmx1g -jar �C:\<path to DBI Tail>\dbi-Tail.jar" 
+              Target : C:\<path to java>\javaw.exe -Xmx1g -jar ?C:\<path to DBI Tail>\dbi-Tail.jar" 
               Start in : C:\<path to DBI Tail> 
 
 
@@ -49,5 +49,5 @@ BEAWARE:
 
 Run of DBI Tail on a production server is at your own risks. 
 If you want to view log files from there, it is recommended 
-to open a Read-Only shared folder over the network, or use SSH. 
+to open a Read-Only shared folder over the network, or to use SSH. 
 
