@@ -23,7 +23,6 @@ package com.dbiservices.monitoring.tail.textconsole;
  * @since   16.11.2015
  */
 
-import com.dbiservices.monitoring.tail.ColorConfiguration;
 import com.dbiservices.monitoring.tail.InformationObject;
 
 public interface IOutputConsole {

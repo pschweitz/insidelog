@@ -189,27 +189,22 @@ public class TreeItemNode extends TreeItem<String> implements Serializable {
 
     public static void refreshColorConfiguration(TreeItemNode treeItemNode, ColorConfiguration colorConfiguration) {
 
-        
-                
         if (((TreeItemNode) treeItemNode).isFile()) {
 
-                logger.debug("treeItemNode: " + treeItemNode.informationObject.getDisplayName());
+            logger.debug("treeItemNode: " + treeItemNode.informationObject.getDisplayName());
             if (treeItemNode.informationObject.getColorConfiguration().templateName.equals(colorConfiguration.templateName)
-                    && ! treeItemNode.informationObject.getColorConfiguration().templateName.equals(DbiTail.colorFileName)) {
-                
+                    && !treeItemNode.informationObject.getColorConfiguration().templateName.equals(DbiTail.colorFileName)) {
+
                 logger.debug("refresh color configuration: " + treeItemNode.informationObject.getDisplayName());
-                
+
                 treeItemNode.informationObject.setColorConfiguration(colorConfiguration);
-       //         ServiceScheduler.getScheduledDefinition(treeItemNode.informationObject.getFullName()).refreshWindowConfiguration(colorConfiguration);
             }
 
         } else {
             ObservableList<TreeItem<String>> children = treeItemNode.getChildren();
 
             for (TreeItem<String> child : children) {
-                //if (((TreeItemNode) child).isNode) {
-                    refreshColorConfiguration((TreeItemNode) child, colorConfiguration);
-                //}
+                refreshColorConfiguration((TreeItemNode) child, colorConfiguration);
             }
         }
     }
@@ -227,13 +222,10 @@ public class TreeItemNode extends TreeItem<String> implements Serializable {
             getRecursiveLeaf((TreeItemNode) this, nodes);
 
             for (TreeItemNode node : nodes) {
-                //node.stopTailSchedule();
 
                 if (ApplicationContext.getInstance().containsKey(node.getInformationObject().getFullName())) {
                     WindowTextConsole textComsole = (WindowTextConsole) ApplicationContext.getInstance().get(node.getInformationObject().getFullName());
-                    //textComsole.clear();
                 }
-                //node.hideTextconsole();
             }
         }
     }
@@ -270,7 +262,7 @@ public class TreeItemNode extends TreeItem<String> implements Serializable {
             for (TreeItemNode node : nodes) {
                 String fullname = getFullPath(node);
                 node.getInformationObject().setFullName(fullname);
-                if (node.getInformationObject().getWindowTextConsole() != null) {                    
+                if (node.getInformationObject().getWindowTextConsole() != null) {
                     node.getInformationObject().getWindowTextConsole().setName(fullname);
                 }
             }

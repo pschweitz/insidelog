@@ -21,7 +21,6 @@ package com.dbiservices.monitoring.tail;
  * @version 1.1
  * @since 16.11.2015
  */
-import com.dbiservices.monitoring.common.schedulerservice.ScheduledDefinition;
 import com.dbiservices.tools.ApplicationContext;
 import com.dbiservices.tools.Logger;
 import java.io.BufferedReader;
@@ -29,7 +28,6 @@ import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -57,12 +55,13 @@ public class ColorConfiguration {
 
     public ArrayList<PatternColorConfiguration> colorConfigurationList;
 
+    
     public ColorConfiguration() {
         this((String) ApplicationContext.getInstance().get("colorFileName"));
     }
 
     public ColorConfiguration(String colorFileName) {
-
+        
         colorConfigurationList = new ArrayList();
 
         if (!Files.exists(Paths.get(colorFileName))) {
@@ -288,8 +287,11 @@ public class ColorConfiguration {
     }
     
     
+    
     private void saveColorToFile(String colorFileName) {
 
+        logger.debug("Saving Color configuration to file: " + colorFileName);
+        
         BufferedWriter bw_colorView = null;
 
         Path filePath = Paths.get(colorFileName);
@@ -339,6 +341,6 @@ public class ColorConfiguration {
         } catch (IOException e) {
             logger.error("Error saving color file: " + filePath, e);
         }
-    }
+    }   
 
 }

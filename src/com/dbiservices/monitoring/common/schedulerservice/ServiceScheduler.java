@@ -22,7 +22,6 @@ package com.dbiservices.monitoring.common.schedulerservice;
  * @since 16.11.2015
  */
 import com.dbiservices.monitoring.tail.TailSSH;
-import com.dbiservices.tools.ApplicationContext;
 import com.dbiservices.tools.Logger;
 import java.util.Hashtable;
 
@@ -41,7 +40,6 @@ public class ServiceScheduler {
 
     public static void addScheduledDefinition(String fullName, ScheduledDefinition scheduledDefinition) {
         logger.trace("addScheduledDefinition: " + fullName);
-        // scheduledDefinition.refreshWindowConfiguration();
         scheduledDefinition.setEnabled(true);
         boolean success = true;
 
@@ -92,9 +90,5 @@ public class ServiceScheduler {
 
     public static Hashtable<String, ScheduledDefinition> getScheduledDefinitionPool() {
         return scheduledDefinitionPool;
-    }
-
-    public static void setScheduledDefinitionPool(Hashtable<String, ScheduledDefinition> scheduledDefinitionPool) {
-        scheduledDefinitionPool = scheduledDefinitionPool;
     }
 }

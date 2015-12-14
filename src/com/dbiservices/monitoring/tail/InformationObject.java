@@ -26,8 +26,6 @@ import com.dbiservices.tools.ApplicationContext;
 import com.dbiservices.tools.Logger;
 import java.io.Serializable;
 import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.StringTokenizer;
 
 public class InformationObject implements Serializable {

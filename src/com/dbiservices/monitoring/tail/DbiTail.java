@@ -129,7 +129,6 @@ public class DbiTail extends Application {
     private ChoiceBox choiceBoxColorTemplate = new ChoiceBox();
     private ChoiceBox choiceBoxCharset = new ChoiceBox();
 
-//    private final TextField textFieldGroupName = new TextField();
     private VBox vboxInformationFile;
     private VBox vboxInformationGroup;
     private VBox vboxInformationRoot;
@@ -137,7 +136,6 @@ public class DbiTail extends Application {
     private TitledPane metricOveralDefinition;
     private GridPane gridPaneName;
     private GridPane gridPaneInformation;
-    //private GridPane gridPaneScheduler;
     private SplitPane splitPaneCenter;
 
     private Label labelNodeName;
@@ -202,8 +200,8 @@ public class DbiTail extends Application {
 
         initMainStage(mainStage);
     }
+    
     /* opens a file from filesystem */
-
     private void openSavedFile(String fileName) {
 
         ArrayList<String> fileList = new ArrayList();
@@ -214,7 +212,6 @@ public class DbiTail extends Application {
         dialog.setHeaderText("Select applicatble color template");
         dialog.setContentText("Select template: ");
 
-// Traditional way to get the response value.
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()) {
             String colorFile = result.get();
@@ -429,50 +426,11 @@ public class DbiTail extends Application {
         choiceBoxColorTemplate = new ChoiceBox();
         choiceBoxColorTemplate.setPrefWidth(1000);
 
-        ArrayList<String> fileList = new ArrayList();
-        DbiTail.getConfigurationFileList(Paths.get("etc").toFile(), fileList);
-
-        choiceBoxColorTemplate.setItems(FXCollections.observableArrayList(fileList));
-        int selectedIndexFile = 0;
-        for (String item : (ObservableList<String>) choiceBoxColorTemplate.getItems()) {
-
-            if (item.equals(DbiTail.colorFileName.substring("etc/".length()))) {
-                break;
-            }
-            selectedIndexFile++;
-        }
-
-        if (selectedIndexFile >= choiceBoxColorTemplate.getItems().size()) {
-            selectedIndexFile = 0;
-        }
-
-        choiceBoxColorTemplate.getSelectionModel().select(selectedIndexFile);
-
         Label labelCharset = new Label("Charset:");
         labelBufferSize.setAlignment(Pos.CENTER_RIGHT);
         choiceBoxCharset = new ChoiceBox();
         choiceBoxCharset.setPrefWidth(1000);
-
-        ArrayList<String> charsetList = new ArrayList();
-        charsetList.add("Auto detect");
-        charsetList.addAll(Charset.availableCharsets().keySet());
-
-        choiceBoxCharset.setItems(FXCollections.observableArrayList(charsetList));
-        int selectedIndexCharset = 0;
-        for (String item : (ObservableList<String>) choiceBoxCharset.getItems()) {
-
-            if (item.equals("Auto detect")) {
-                break;
-            }
-            selectedIndexCharset++;
-        }
-
-        if (selectedIndexCharset >= choiceBoxCharset.getItems().size()) {
-            selectedIndexCharset = 0;
-        }
-
-        choiceBoxCharset.getSelectionModel().select(selectedIndexCharset);
-
+        
         gridPaneInformation = new GridPane();
         gridPaneInformation.setPadding(new Insets(0, 10, 10, 10));
 
@@ -856,7 +814,7 @@ public class DbiTail extends Application {
 
             @Override
             public void handle(ActionEvent event) {
-//
+                
                 FileChooser fileChooser = new FileChooser();
 
                 Path etcFolder = Paths.get("etc");
@@ -1126,7 +1084,7 @@ public class DbiTail extends Application {
                                     File myFile = new File("UserManual.pdf");
                                     Desktop.getDesktop().open(myFile);
                                 } catch (IOException ex) {
-                                    // no application registered for PDFs
+                                    logger.info("No PDF reader found");
                                     getHostServices().showDocument("https://github.com/pschweitz/DBITail");
                                 }
                             }
@@ -1297,6 +1255,8 @@ public class DbiTail extends Application {
 
                 while (line != null) {
                     if (!line.equals("") && !line.equals("\r")) {
+                        charsetName = "";
+                        fileColors = colorFileName;
 
                         stringTokenizer = new StringTokenizer(line, ",;\"\"");
 
@@ -1386,7 +1346,6 @@ public class DbiTail extends Application {
             }
 
         }
-
         refreshInformationVBox(treeRoot);
     }
 
@@ -1399,6 +1358,8 @@ public class DbiTail extends Application {
         BufferedWriter bw_treeView = null;
 
         Path filePath = Paths.get(treeFileName);
+
+        logger.debug("Saving tree file to: " + treeFileName);
 
         try {
             Files.deleteIfExists(filePath);
@@ -1424,6 +1385,9 @@ public class DbiTail extends Application {
                 String charsetName = "";
                 if (node.getInformationObject().getCharset() != null) {
                     charsetName = node.getInformationObject().getCharset().name();
+                }
+                else{
+                    charsetName = "Auto detect";
                 }
 
                 logger.trace("node.getInformationObject().getDisplayName(): " + node.getInformationObject().getDisplayName());
@@ -1569,20 +1533,20 @@ public class DbiTail extends Application {
 
             newTreeItemFlag = false;
 
-            textFieldNodeName.setText(treeItemNode.getInformationObject().getDisplayName());
-
             textFieldFileLocation.setText(treeItemNode.getInformationObject().getFilePath().toString());
+            textFieldNodeName.setText(treeItemNode.getInformationObject().getDisplayName());
             textFieldBufferSize.setText(String.valueOf(treeItemNode.getInformationObject().getBufferSize()));
             displayColors.setSelected(treeItemNode.getInformationObject().isDisplayColors());
             textFieldFrequency.setText(String.valueOf(treeItemNode.getInformationObject().getFrequency()));
 
             ArrayList<String> fileList = new ArrayList();
+            //fileList.add("default.cfg");
             DbiTail.getConfigurationFileList(Paths.get("etc").toFile(), fileList);
 
             choiceBoxColorTemplate.setItems(FXCollections.observableArrayList(fileList));
             int selectedIndexColor = 0;
-            for (String item : (ObservableList<String>) choiceBoxColorTemplate.getItems()) {
 
+            for (String item : (ObservableList<String>) choiceBoxColorTemplate.getItems()) {
                 if (item.equals(treeItemNode.getInformationObject().getColorConfiguration().templateName)) {
                     break;
                 }
@@ -1595,19 +1559,27 @@ public class DbiTail extends Application {
 
             choiceBoxColorTemplate.getSelectionModel().select(selectedIndexColor);
 
-            int selectedIndexCharset = 0;
-            if (treeItemNode.getInformationObject().getCharset() != null) {
-                for (String item : (ObservableList<String>) choiceBoxCharset.getItems()) {
+            ArrayList<String> charsetList = new ArrayList();
+            charsetList.add("Auto detect");
+            charsetList.addAll(Charset.availableCharsets().keySet());
 
+            choiceBoxCharset.setItems(FXCollections.observableArrayList(charsetList));
+            int selectedIndexCharset = 0;
+            for (String item : (ObservableList<String>) choiceBoxCharset.getItems()) {
+
+                if (treeItemNode.getInformationObject().getCharset() != null) {
                     if (item.equals(treeItemNode.getInformationObject().getCharset().name())) {
                         break;
                     }
                     selectedIndexCharset++;
+                } else {
+                    break;
                 }
 
-                if (selectedIndexCharset >= choiceBoxCharset.getItems().size()) {
-                    selectedIndexCharset = 0;
-                }
+            }
+
+            if (selectedIndexCharset >= choiceBoxCharset.getItems().size()) {
+                selectedIndexCharset = 0;
             }
 
             choiceBoxCharset.getSelectionModel().select(selectedIndexCharset);
