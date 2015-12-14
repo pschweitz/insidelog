@@ -223,13 +223,12 @@ public class TailSSH implements IScheduledService, Serializable {
                     Thread.sleep(500);
                 } catch (InterruptedException ex) {
                 }
-                
+
                 channel.setOutputStream(console);
 
                 channel.connect(3 * 1000);
 
                 prompt = new OutputStreamWriter(commandLine);
-
 
                 if (charsetWasNull) {
 
@@ -273,8 +272,9 @@ public class TailSSH implements IScheduledService, Serializable {
         @Override
         public void run() {
 
+            BufferedReader br = null;
+
             while (running) {
-                BufferedReader br = null;
                 try {
                     String input = "";
 
@@ -286,9 +286,10 @@ public class TailSSH implements IScheduledService, Serializable {
 
                     InputStreamReader is = null;
 
-                    is = new InputStreamReader(consoleInput, charset);
-
-                    br = new BufferedReader(is);
+                    if (br == null) {
+                        is = new InputStreamReader(consoleInput, charset);
+                        br = new BufferedReader(is);
+                    }
 
                     input = br.readLine();
 
