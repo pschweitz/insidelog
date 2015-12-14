@@ -200,7 +200,7 @@ public class DbiTail extends Application {
 
         initMainStage(mainStage);
     }
-    
+
     /* opens a file from filesystem */
     private void openSavedFile(String fileName) {
 
@@ -430,7 +430,7 @@ public class DbiTail extends Application {
         labelBufferSize.setAlignment(Pos.CENTER_RIGHT);
         choiceBoxCharset = new ChoiceBox();
         choiceBoxCharset.setPrefWidth(1000);
-        
+
         gridPaneInformation = new GridPane();
         gridPaneInformation.setPadding(new Insets(0, 10, 10, 10));
 
@@ -814,7 +814,7 @@ public class DbiTail extends Application {
 
             @Override
             public void handle(ActionEvent event) {
-                
+
                 FileChooser fileChooser = new FileChooser();
 
                 Path etcFolder = Paths.get("etc");
@@ -1079,14 +1079,20 @@ public class DbiTail extends Application {
                     public void handle(ActionEvent event) {
 
                         if (Files.exists(Paths.get("UserManual.pdf"))) {
-                            if (Desktop.isDesktopSupported()) {
-                                try {
-                                    File myFile = new File("UserManual.pdf");
-                                    Desktop.getDesktop().open(myFile);
-                                } catch (IOException ex) {
-                                    logger.info("No PDF reader found");
-                                    getHostServices().showDocument("https://github.com/pschweitz/DBITail");
+
+                            String osName = System.getProperty("os.name").toLowerCase();
+                            if (!osName.contains("nix") && !osName.contains("nux") && !osName.contains("aix")) {
+                                if (Desktop.isDesktopSupported()) {
+                                    try {
+                                        File myFile = new File("UserManual.pdf");
+                                        Desktop.getDesktop().open(myFile);
+                                    } catch (IOException ex) {
+                                        logger.info("No PDF reader found");
+                                        getHostServices().showDocument("https://github.com/pschweitz/DBITail");
+                                    }
                                 }
+                            } else {
+                                getHostServices().showDocument("https://github.com/pschweitz/DBITail");
                             }
                         } else {
                             getHostServices().showDocument("https://github.com/pschweitz/DBITail");
@@ -1385,8 +1391,7 @@ public class DbiTail extends Application {
                 String charsetName = "";
                 if (node.getInformationObject().getCharset() != null) {
                     charsetName = node.getInformationObject().getCharset().name();
-                }
-                else{
+                } else {
                     charsetName = "Auto detect";
                 }
 
