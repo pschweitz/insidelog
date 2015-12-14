@@ -17,7 +17,6 @@ package com.dbiservices.monitoring.tail;
 
 import com.dbiservices.tools.Logger;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.SortedMap;
@@ -32,16 +31,14 @@ public class CharsetDetect extends Thread {
     private static final Logger logger = Logger.getLogger(CharsetDetect.class);
 
     private InputStream in = null;
-    private OutputStream out = null;
     private InformationObject informationObject = null;
     private long maxChanlangedBytes = 4096;
 
     public Charset charset = StandardCharsets.US_ASCII;
 
-    public CharsetDetect(InputStream in, OutputStream out, InformationObject informationObject, long maxChanlangedBytes) {
+    public CharsetDetect(InputStream in, InformationObject informationObject, long maxChanlangedBytes) {
 
         this.in = in;
-        this.out = out;
         this.informationObject = informationObject;
         this.maxChanlangedBytes = maxChanlangedBytes;
     }
@@ -61,10 +58,6 @@ public class CharsetDetect extends Thread {
                 while ((nread = in.read(buf)) > 0 && !detector.isDone() && nreadtotal < maxChanlangedBytes) {
                     detector.handleData(buf, 0, nread);
                     nreadtotal += nread;
-                    if (out != null) {
-                        out.write(buf, 0, nread);
-                        out.flush();
-                    }
                 }
 
                 detector.dataEnd();
@@ -89,14 +82,6 @@ public class CharsetDetect extends Thread {
 
             } catch (Exception e) {
             } finally {
-
-                if (out != null) {
-                    try {
-                        out.close();
-                    } catch (Exception ex) {
-                    }
-                }
-
                 try {
                     in.close();
                 } catch (Exception ex) {

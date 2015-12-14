@@ -23,23 +23,13 @@ package com.dbiservices.monitoring.tail;
  */
 import com.dbiservices.monitoring.common.schedulerservice.IScheduledService;
 import com.dbiservices.tools.Logger;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.SortedMap;
-import java.util.logging.Level;
-import org.mozilla.universalchardet.UniversalDetector;
 
 public class TailFile implements IScheduledService, Serializable {
 
@@ -79,7 +69,7 @@ public class TailFile implements IScheduledService, Serializable {
 
             if (charset == null) {
                 fstream = new FileInputStream(file);
-                charsetDetect = new CharsetDetect(fstream, null, informationObject, 1048576 ); // 1Mo of check
+                charsetDetect = new CharsetDetect(fstream, informationObject, 1048576 ); // 1Mo of check
                 charsetDetect.start();
                 try {
                     charsetDetect.join();
@@ -105,7 +95,6 @@ public class TailFile implements IScheduledService, Serializable {
                 }
             }
 
-            //         logger.debug("OFF offset: " + offset);
             String line = "";
 
             int counter = 0;

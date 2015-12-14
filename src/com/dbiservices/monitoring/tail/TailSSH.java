@@ -33,7 +33,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
@@ -44,7 +43,6 @@ import java.util.Hashtable;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.Level;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -78,6 +76,8 @@ public class TailSSH implements IScheduledService, Serializable {
     private Channel channel;
     private Session session;
     private OutputStreamWriter prompt;
+
+    private String filename;
 
     private static final Hashtable<String, Hashtable> hostsInformation = new Hashtable();
 
@@ -131,7 +131,7 @@ public class TailSSH implements IScheduledService, Serializable {
         Charset charset = informationObject.getCharset();
 
         boolean openSession = true;
-        String filename = informationObject.getFilePath().substring("ssh://".length());
+        filename = informationObject.getFilePath().substring("ssh://".length());
         String host = "";
         String user = "";
         String passwd = "";
@@ -210,46 +210,31 @@ public class TailSSH implements IScheduledService, Serializable {
 
                 channel.setInputStream(commandLineInput);
 
-                CharsetDetect charsetDetect = null;
-
-                InputStreamReader is = null;
+                boolean charsetWasNull = false;
 
                 if (charset == null) {
-
-                    /*
-                     PipedOutputStream poMessageDetect = new PipedOutputStream();
-                     PipedInputStream piMessageDetect = new PipedInputStream(poMessageDetect);
-                     BufferedInputStream consoleInputDetect = new BufferedInputStream(piMessageDetect);
-                     BufferedOutputStream consoleDetect = new BufferedOutputStream(poMessageDetect);
-
-                     charsetDetect = new CharsetDetect(consoleInput, consoleDetect, informationObject, Long.MAX_VALUE); // 1Mo of check
-                     charsetDetect.start();
-                     charset = charsetDetect.charset;
-                    
-                     is = new InputStreamReader(consoleInputDetect, charset);
-                     */
-                    charset = Charset.forName("US-ASCII");
-
+                    charsetWasNull = true;
                 }
-                //else {
 
-                is = new InputStreamReader(consoleInput, charset);
-                //}
-
-                BufferedReader br = new BufferedReader(is);
-
-                ConsoleStreamReader streamReader = new ConsoleStreamReader(br);
+                ConsoleStreamReader streamReader = new ConsoleStreamReader();
                 streamReader.start();
 
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                }
+                
                 channel.setOutputStream(console);
 
                 channel.connect(3 * 1000);
 
                 prompt = new OutputStreamWriter(commandLine);
 
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException ex) {
+
+                if (charsetWasNull) {
+
+                    prompt.append("file -i " + filename).append(System.lineSeparator());
+                    prompt.flush();
                 }
 
                 prompt.append("tail -f " + filename).append(System.lineSeparator());
@@ -264,8 +249,15 @@ public class TailSSH implements IScheduledService, Serializable {
                 messageQueue.add(" ");
                 messageQueue.add("error: Username or password incorrect");
                 messageQueue.add(" ");
+            } else if (e.toString().startsWith("com.jcraft.jsch.JSchException: java.net.UnknownHostException")) {
+                messageQueue.add(" ");
+                messageQueue.add("error: host not found: " + host);
+                messageQueue.add(" ");
             } else {
                 logger.error("Error connecting to host: " + host, e);
+                messageQueue.add(" ");
+                messageQueue.add("error: connecting to host: " + host + ": " + e.toString());
+                messageQueue.add(" ");
             }
         }
 
@@ -274,27 +266,48 @@ public class TailSSH implements IScheduledService, Serializable {
 
     private class ConsoleStreamReader extends Thread {
 
-        private BufferedReader reader = null;
-
-        public ConsoleStreamReader(BufferedReader reader) {
+        public ConsoleStreamReader() {
             super("ConsoleStreamReader");
-
-            this.reader = reader;
         }
 
         @Override
         public void run() {
 
             while (running) {
-
+                BufferedReader br = null;
                 try {
                     String input = "";
 
-                    input = this.reader.readLine();
+                    Charset charset = informationObject.getCharset();
+
+                    if (charset == null) {
+                        charset = Charset.forName("US-ASCII");
+                    }
+
+                    InputStreamReader is = null;
+
+                    is = new InputStreamReader(consoleInput, charset);
+
+                    br = new BufferedReader(is);
+
+                    input = br.readLine();
 
                     while (!input.equals("")) {
+
+                        if (informationObject.getCharset() == null) {
+                            if (input.startsWith(filename)) {
+
+                                logger.debug("charset: " + input.substring(input.indexOf("charset=") + 8));
+                                try {
+                                    informationObject.setCharset(Charset.forName(input.substring(input.indexOf("charset=") + 8)));
+                                    DbiTail.saveTreeToFile();
+                                } catch (Exception e) {
+                                }
+                            }
+                        }
+
                         messageQueue.add(input);
-                        input = this.reader.readLine();
+                        input = br.readLine();
                     }
 
                 } catch (Exception e) {
@@ -306,7 +319,7 @@ public class TailSSH implements IScheduledService, Serializable {
                 prompt.close();
                 session.disconnect();
                 channel.disconnect();
-                this.reader.close();
+                consoleInput.close();
             } catch (Exception ex) {
             }
         }
@@ -363,6 +376,7 @@ public class TailSSH implements IScheduledService, Serializable {
             prompt.close();
             session.disconnect();
             channel.disconnect();
+            consoleInput.close();
         } catch (Exception ex) {
         }
     }
@@ -385,7 +399,7 @@ public class TailSSH implements IScheduledService, Serializable {
             try {
                 prompt.append("exit").append(System.lineSeparator());
                 prompt.flush();
-            } catch (IOException ex) {
+            } catch (Exception ex) {
             }
         }
     }
@@ -426,19 +440,15 @@ public class TailSSH implements IScheduledService, Serializable {
 
     private Optional<Pair<String, String>> getCredentials(String usernameText, String hostname) {
 
-        // Create the custom dialog.
         Dialog<Pair<String, String>> dialog = new Dialog<>();
         dialog.setTitle("Login Dialog");
         dialog.setHeaderText("Connection to host " + hostname);
 
-// Set the icon (must be included in the project).
         dialog.setGraphic(new ImageView(new Image("login.png")));
 
-// Set the button types.
         ButtonType loginButtonType = new ButtonType("Login", ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
 
-// Create the username and password labels and fields.
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
@@ -455,11 +465,9 @@ public class TailSSH implements IScheduledService, Serializable {
         grid.add(new Label("Password:"), 0, 1);
         grid.add(password, 1, 1);
 
-// Enable/Disable login button depending on whether a username was entered.
         Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
         loginButton.setDisable(true);
 
-// Do some validation (using the Java 8 lambda syntax).
         password.textProperty().addListener((observable, oldValue, newValue) -> {
             loginButton.setDisable(false);
         });
@@ -472,7 +480,6 @@ public class TailSSH implements IScheduledService, Serializable {
             Platform.runLater(() -> password.requestFocus());
         }
 
-// Convert the result to a username-password-pair when the login button is clicked.
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == loginButtonType) {
                 return new Pair<>(username.getText(), password.getText());
@@ -483,9 +490,5 @@ public class TailSSH implements IScheduledService, Serializable {
         Optional<Pair<String, String>> result = dialog.showAndWait();
 
         return result;
-        /*
-         result.ifPresent(usernamePassword -> {
-         System.out.println("Username=" + usernamePassword.getKey() + ", Password=" + usernamePassword.getValue());
-         });*/
     }
 }

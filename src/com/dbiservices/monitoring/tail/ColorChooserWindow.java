@@ -23,7 +23,6 @@ package com.dbiservices.monitoring.tail;
  * @since   16.11.2015
  */
 
-import com.dbiservices.tools.ApplicationContext;
 import com.dbiservices.tools.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

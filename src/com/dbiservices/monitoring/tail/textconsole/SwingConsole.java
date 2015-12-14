@@ -23,11 +23,9 @@ package com.dbiservices.monitoring.tail.textconsole;
  */
 import com.dbiservices.monitoring.tail.InformationObject;
 import com.dbiservices.monitoring.tail.PatternColorConfiguration;
-import com.dbiservices.monitoring.tail.ColorConfiguration;
 import com.dbiservices.tools.Logger;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -46,7 +44,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
 import javafx.embed.swing.SwingNode;
 import javafx.scene.layout.StackPane;
 import javax.swing.JComponent;
@@ -92,10 +89,6 @@ public class SwingConsole extends StackPane implements IOutputConsole {
 
     public static String lineSeparator = System.getProperty("line.separator");
 
-   // private Font font;
-
-  //  private ColorConfiguration colorConfiguration;
-
     private boolean bufferOverflow = false;
 
     private int insertCount = 0;
@@ -103,11 +96,9 @@ public class SwingConsole extends StackPane implements IOutputConsole {
     private InformationObject informationObject;
 
     public SwingConsole(InformationObject informationObject) {
-    //public SwingConsole(ColorConfiguration colorConfiguration) {
         super();
 
         this.informationObject = informationObject;
-   //     this.colorConfiguration = colorConfiguration;
         doc = new DefaultStyledDocument();
         textPane.setDocument(doc);
 

@@ -21,13 +21,8 @@ package com.dbiservices.monitoring.common.schedulerservice;
  * @version 1.1
  * @since 16.11.2015
  */
-import com.dbiservices.monitoring.tail.ColorConfiguration;
-import com.dbiservices.monitoring.tail.DbiTail;
 import com.dbiservices.monitoring.tail.InformationObject;
-import com.dbiservices.tools.ApplicationContext;
 import com.dbiservices.tools.Logger;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -62,26 +57,6 @@ public class ScheduledDefinition {
         }
     }
 
-    /*
-    public void refreshWindowConfiguration() {
-        logger.info("informationObject.getFileColors(): " + informationObject.getFileColors());
-
-        if (informationObject.getFileColors().equals(DbiTail.colorFileName) {
-            informationObject.setColorConfiguration((ColorConfiguration) ApplicationContext.getInstance().get("colorDefaultConfiguration"));
-        } else {
-            if (!Files.exists(Paths.get(informationObject.getFileColors()))) {
-                informationObject.setColorConfiguration(new ColorConfiguration(DbiTail.colorFileName);
-            }
-        }
-    }
-
-    public void refreshWindowConfiguration(ColorConfiguration colorConfiguration) {
-        logger.info("informationObject.getFileColors(): " + informationObject.getFileColors());
-
-        informationObject.setColorConfiguration(colorConfiguration);
-    }
-    */
-
     public IScheduledService getiScheduledService() {
         return iScheduledService;
     }
@@ -93,16 +68,13 @@ public class ScheduledDefinition {
     public void setEnabled(boolean isEnabled) {
         this.isEnabled = isEnabled;
 
-        //if (!isEnabled) {
         iScheduledService.setEnabled(isEnabled);
-        //}
-
     }
 
     public InformationObject getInformationObject() {
         return informationObject;
-    }    
-    
+    }
+
     public String getDisplayName() {
         return displayName;
     }

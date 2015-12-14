@@ -35,7 +35,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-import java.util.UUID;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -162,12 +161,7 @@ public class ColorChooserWindowControler implements Initializable {
 
         File file = fileChooser.showSaveDialog(this.colorChooserWindowStage);
 
-        logger.debug("file.getPath(): " + file.getPath());
-        logger.debug("Paths.get(file.getPath()): " + Paths.get(file.getPath()));
-
         Path relative = Paths.get(etcFolder.toFile().getAbsolutePath()).relativize(Paths.get(file.getAbsolutePath()));
-
-        logger.debug("file: etc/" + relative);
 
         fileColors = "etc/" + relative;
 
@@ -206,10 +200,6 @@ public class ColorChooserWindowControler implements Initializable {
         }
 
         colorConfiguration.templateName = fileColors.substring("etc/".length());
-
-        logger.debug("\"etc/\" + colorConfigurationEdit.templateName: " + "etc/" + colorConfigurationEdit.templateName);
-        logger.debug("DbiTail.colorFileName: " + DbiTail.colorFileName);
-        logger.debug("informationObject.getFilePath().toString().equals(\".\"): " + informationObject.getFilePath().toString().equals("."));
         
         if (fileColors.equals(DbiTail.colorFileName) && informationObject.getFilePath().toString().equals(".")) {
             applicationContext.put("colorDefaultConfiguration", colorConfiguration);   
@@ -224,19 +214,12 @@ public class ColorChooserWindowControler implements Initializable {
         DbiTail.saveTreeToFile();
         DbiTail.updateInformationObjetcs(colorConfiguration);
 
-        /*
-         try {
-         if (!oldFileColorsName.equals(DbiTail.colorFileName) {
-         Files.delete(Paths.get(oldFileColorsName));
-         }
-         } catch (IOException ex) {
-         logger.error("Error deleting file: " + oldFileColorsName, ex);
-         }
-         */
         colorChooserWindowStage.close();
     }
 
     private void saveColorToFile(String colorFileName) {
+        
+        logger.debug("Saving to file: " + colorFileName);
 
         BufferedWriter bw_colorView = null;
 
@@ -462,7 +445,6 @@ public class ColorChooserWindowControler implements Initializable {
 
         if (selectedIndexFile >= templateName.getItems().size()) {
 
-            // put index of default;
             selectedIndexFile = 0;
         }
 

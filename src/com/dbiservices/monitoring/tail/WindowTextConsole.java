@@ -26,7 +26,6 @@ import com.dbiservices.monitoring.common.schedulerservice.ScheduledDefinition;
 import com.dbiservices.monitoring.common.schedulerservice.ServiceScheduler;
 import com.dbiservices.monitoring.tail.textconsole.IOutputConsole;
 import com.dbiservices.monitoring.tail.textconsole.SwingConsole;
-import com.dbiservices.tools.ApplicationContext;
 import com.dbiservices.tools.Logger;
 import java.io.File;
 import java.util.concurrent.Executor;
