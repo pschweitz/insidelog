@@ -39,6 +39,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.Hashtable;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
@@ -135,6 +136,7 @@ public class TailSSH implements IScheduledService, Serializable {
         String host = "";
         String user = "";
         String passwd = "";
+        String privateKey = "";
 
         try {
 
@@ -165,13 +167,18 @@ public class TailSSH implements IScheduledService, Serializable {
             }
 
             if (!user.equals("") && !host.equals("")) {
-                passwd = getPassword(user, host);
+                if (user.contains(":")) {
+                    privateKey = Paths.get(user.substring(user.indexOf(':') + 1)).toAbsolutePath().toString();
+                    user = user.substring(0, user.indexOf(':'));
+                } else {
+                    passwd = getPassword(user, host);
+                }
             }
 
-            if (passwd.equals("")) {
+            if (passwd.equals("") && privateKey.equals("")) {
                 Optional<Pair<String, String>> resultPair = getCredentials(user, host);
 
-                if (resultPair != null) {
+                if (resultPair != null && resultPair.isPresent()) {
                     user = resultPair.get().getKey();
                     passwd = resultPair.get().getValue();
                 }
@@ -180,6 +187,7 @@ public class TailSSH implements IScheduledService, Serializable {
             logger.debug("host: " + host);
             logger.debug("user: " + user);
             logger.debug("password: ****** ");
+            logger.debug("privateKey: " + privateKey);
             logger.debug("filename: " + filename);
             logger.debug("openSession: " + openSession);
 
@@ -190,7 +198,11 @@ public class TailSSH implements IScheduledService, Serializable {
             if (openSession) {
                 session = jsch.getSession(user, host, 22);
 
-                session.setPassword(passwd);
+                if (!privateKey.equals("")) {
+                    jsch.addIdentity(privateKey);
+                } else {
+                    session.setPassword(passwd);
+                }
 
                 UserInfo ui = new MyUserInfo() {
                     public void showMessage(String message) {
@@ -204,7 +216,9 @@ public class TailSSH implements IScheduledService, Serializable {
 
                 session.connect(30000);   // making a connection with timeout.
 
-                updatePassword(user, host, passwd);
+                if (!passwd.equals("")) {
+                    updatePassword(user, host, passwd);
+                }
 
                 channel = session.openChannel("shell");
 

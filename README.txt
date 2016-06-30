@@ -15,7 +15,7 @@ Sorry for Mac users, packaged build is not available for the moment.
 It is released under Apache v2 License
 
 /*
- * Copyright 2015 Philippe Schweitzer.
+ * Copyright 2016 dbi services ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

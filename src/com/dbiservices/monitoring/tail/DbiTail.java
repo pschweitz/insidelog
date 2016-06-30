@@ -103,7 +103,7 @@ public class DbiTail extends Application {
     private static final Logger logger = Logger.getLogger(DbiTail.class);
 
     public int year = 2016;
-    public String version = "1.2";
+    public String version = "1.2.1";
 
     private static String[] args;
     private static String treeFileName = "etc/" + ApplicationContext.getInstance().getString("tail.defaultTreeConfiguration");
