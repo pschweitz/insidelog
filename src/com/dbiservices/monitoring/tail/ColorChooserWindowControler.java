@@ -164,6 +164,10 @@ public class ColorChooserWindowControler implements Initializable {
         Path relative = Paths.get(etcFolder.toFile().getAbsolutePath()).relativize(Paths.get(file.getAbsolutePath()));
 
         fileColors = "etc/" + relative;
+                
+        if(!fileColors.endsWith(".cfg")){
+            fileColors += ".cfg";
+        }
 
         fireSave();
     }
@@ -218,7 +222,7 @@ public class ColorChooserWindowControler implements Initializable {
     }
 
     private void saveColorToFile(String colorFileName) {
-        
+                
         logger.debug("Saving to file: " + colorFileName);
 
         BufferedWriter bw_colorView = null;

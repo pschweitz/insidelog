@@ -35,8 +35,12 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -46,14 +50,20 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 import javafx.embed.swing.SwingNode;
 import javafx.scene.layout.StackPane;
+import javax.swing.AbstractAction;
 import javax.swing.JComponent;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
 import javax.swing.Painter;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.BoxView;
@@ -92,7 +102,7 @@ public class SwingConsole extends StackPane implements IOutputConsole {
     private boolean bufferOverflow = false;
 
     private int insertCount = 0;
-    
+
     private InformationObject informationObject;
 
     public SwingConsole(InformationObject informationObject) {
@@ -261,12 +271,10 @@ public class SwingConsole extends StackPane implements IOutputConsole {
                                             break;
                                         }
 
-                                    } else {
-                                        if (token.toLowerCase().contains(patternColorConfiguration.pattern.toLowerCase())) {
-                                            color = patternColorConfiguration.getSwingColor();
+                                    } else if (token.toLowerCase().contains(patternColorConfiguration.pattern.toLowerCase())) {
+                                        color = patternColorConfiguration.getSwingColor();
 
-                                            break;
-                                        }
+                                        break;
                                     }
                                 }
 
@@ -288,7 +296,7 @@ public class SwingConsole extends StackPane implements IOutputConsole {
 
                 ((JTextPane) ((JComponent) swingNode.getContent().getComponent(0)).getComponent(0)).setCaretPosition(doc.getLength());
             }
-        });                
+        });
     }
 
     @Override
@@ -500,8 +508,8 @@ public class SwingConsole extends StackPane implements IOutputConsole {
     }
 
     @Override
- 
-    public void setInformationObject(InformationObject informationObject){
+
+    public void setInformationObject(InformationObject informationObject) {
         this.informationObject = informationObject;
     }
 
@@ -636,12 +644,67 @@ public class SwingConsole extends StackPane implements IOutputConsole {
 
         public ExtendedJTextPane() {
             super();
+            this.getCaret().setSelectionVisible(true);
             setEditorKit(new ExtendedScaledEditorKit());
+
+            JPopupMenu pop = new JPopupMenu();
+            final JMenuItem copy = new JMenuItem("Copy      CTRL+C");
+            copy.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String selected = getSelectedText();
+                    if (selected == null) {
+                        return;
+                    }
+
+                    Clipboard cb;
+
+                    DataFlavor textFlavor = new DataFlavor("text/plain", "Text Format");
+                    DataFlavor flavors[] = {textFlavor};
+                    cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    Object data[] = {new ByteArrayInputStream(getSelectedText().getBytes())};
+                    Transferable p = new SwingConsole.DataTransferClass(data, flavors);
+                    cb.setContents(p, null);
+                }
+            });
+            pop.add(copy);
+            pop.addPopupMenuListener(new PopupMenuListener() {
+                public void popupMenuCanceled(PopupMenuEvent e) {
+                }
+
+                public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                }
+
+                public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                    copy.setEnabled(getSelectedText() != null);
+                }
+            });
+
+            this.setComponentPopupMenu(pop);
         }
 
         @Override
         public void repaint(int x, int y, int width, int height) {
             super.repaint(0, 0, getWidth(), getHeight());
+        }
+
+        @Override
+        public String getSelectedText() {
+            int selectionStart = textPane.getSelectionStart();
+            int selectionEnd = textPane.getSelectionEnd();
+
+            String content = null;
+            try {
+
+                int selectedLength = selectionEnd - selectionStart;
+                if (selectedLength > 0) {
+                    content = doc.getText(selectionStart, selectedLength);
+                }
+            } catch (Exception e) {
+            }
+
+            return content;
         }
     };
 
