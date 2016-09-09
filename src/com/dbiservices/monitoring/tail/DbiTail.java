@@ -103,7 +103,7 @@ public class DbiTail extends Application {
     private static final Logger logger = Logger.getLogger(DbiTail.class);
 
     public int year = 2016;
-    public String version = "1.2.2";
+    public String version = "1.2.3";
 
     private static String[] args;
     private static String treeFileName = "etc/" + ApplicationContext.getInstance().getString("tail.defaultTreeConfiguration");
@@ -830,12 +830,18 @@ public class DbiTail extends Application {
                 if (file != null) {
                     Path relative = Paths.get(etcFolder.toFile().getAbsolutePath()).relativize(Paths.get(file.getAbsolutePath()));
                     treeFileName = "etc/" + relative;
+                    
+                    if(!treeFileName.endsWith(".tree")){
+                        treeFileName += ".tree";
+                    }
 
                     try {
                         Files.deleteIfExists(relative);
                     } catch (IOException e) {
                         logger.error("Error saving files tree file: " + treeFileName, e);
                     }
+                    
+                    saveTreeToFile();
                 }
             }
         }
@@ -1264,7 +1270,7 @@ public class DbiTail extends Application {
                         charsetName = "";
                         fileColors = colorFileName;
 
-                        stringTokenizer = new StringTokenizer(line, ",;\"\"");
+                        stringTokenizer = new StringTokenizer(line, ";\"\"");
 
                         int counter = 0;
                         while (stringTokenizer.hasMoreElements()) {
@@ -1365,7 +1371,7 @@ public class DbiTail extends Application {
 
         Path filePath = Paths.get(treeFileName);
 
-        logger.debug("Saving tree file to: " + treeFileName);
+        logger.trace("Saving tree file to: " + treeFileName);
 
         try {
             Files.deleteIfExists(filePath);
