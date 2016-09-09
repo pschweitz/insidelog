@@ -1371,7 +1371,7 @@ public class DbiTail extends Application {
 
         Path filePath = Paths.get(treeFileName);
 
-        logger.trace("Saving tree file to: " + treeFileName);
+        logger.trace("Saving tree file to: " + treeFileName );
 
         try {
             Files.deleteIfExists(filePath);
