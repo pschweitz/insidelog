@@ -43,6 +43,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.StringTokenizer;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -102,8 +104,8 @@ public class DbiTail extends Application {
 
     private static final Logger logger = Logger.getLogger(DbiTail.class);
 
-    public int year = 2016;
-    public String version = "1.2.3";
+    public int year = 2017;
+    public String version = "1.3";
 
     private static String[] args;
     private static String treeFileName = "etc/" + ApplicationContext.getInstance().getString("tail.defaultTreeConfiguration");
@@ -741,6 +743,7 @@ public class DbiTail extends Application {
     private void initMainWindow() {
 
         Button btOpenTree;
+        ChoiceBox choiceBoxTreeFile = new ChoiceBox();
         Button btSaveTree;
         Button btAdd;
         Button btRemove;
@@ -800,9 +803,91 @@ public class DbiTail extends Application {
                     treePane.getChildren().add(treeView);
                     initTreeNodes();
                 }
+
+                int selectedIndexTreeFile = 0;
+
+                for (String item : (ObservableList<String>) choiceBoxTreeFile.getItems()) {
+
+                    String treeFileNameTmp = treeFileName;
+
+                    if (treeFileName.contains("/")) {
+                        treeFileNameTmp = treeFileNameTmp.substring(treeFileNameTmp.lastIndexOf("/") + 1);
+                    }
+
+                    if (item.equals(treeFileNameTmp)) {
+                        break;
+                    }
+                    selectedIndexTreeFile++;
+                }
+
+                if (selectedIndexTreeFile >= choiceBoxTreeFile.getItems().size()) {
+                    selectedIndexTreeFile = 0;
+                }
+
+                choiceBoxTreeFile.getSelectionModel().select(selectedIndexTreeFile);
             }
         }
         );
+
+        ArrayList<String> fileList = new ArrayList();
+        DbiTail.getTreeFileList(Paths.get("etc").toFile(), fileList);
+
+        choiceBoxTreeFile.setPrefHeight(30);
+        choiceBoxTreeFile.setTooltip(new Tooltip("Switch files tree"));
+        choiceBoxTreeFile.setItems(FXCollections.observableArrayList(fileList));
+        int selectedIndexTreeFile = 0;
+
+        for (String item : (ObservableList<String>) choiceBoxTreeFile.getItems()) {
+
+            String treeFileNameTmp = treeFileName;
+
+            if (treeFileName.contains("/")) {
+                treeFileNameTmp = treeFileNameTmp.substring(treeFileNameTmp.lastIndexOf("/") + 1);
+            }
+
+            if (item.equals(treeFileNameTmp)) {
+                break;
+            }
+            selectedIndexTreeFile++;
+        }
+
+        if (selectedIndexTreeFile >= choiceBoxTreeFile.getItems().size()) {
+            selectedIndexTreeFile = 0;
+        }
+
+        choiceBoxTreeFile.getSelectionModel().select(selectedIndexTreeFile);
+
+        choiceBoxTreeFile.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue ov, Number value, Number new_value) {
+
+                if (new_value.intValue() != -1) {
+                    logger.debug("Selected tree file: " + "etc/" + choiceBoxTreeFile.getItems().get((int) new_value));
+                    treeFileName = "etc/" + choiceBoxTreeFile.getItems().get((int) new_value);
+                }
+                treePane.getChildren().remove(treeView);
+
+                treeRoot = null;
+
+                initTreeRoot();
+
+                treeView = TreeViewBuilder.<String>create().root(treeRoot).build();
+
+                treeView.setEditable(true);
+                treeView.setMinSize(150, 200);
+
+                treeView.setCellFactory(
+                        new Callback<TreeView<String>, TreeCell<String>>() {
+                            @Override
+                            public TreeCell<String> call(TreeView<String> p) {
+                                return new TreeCellImpl(p);
+                            }
+                        }
+                );
+
+                treePane.getChildren().add(treeView);
+                initTreeNodes();
+            }
+        });
 
         btSaveTree = new Button();
 
@@ -830,8 +915,8 @@ public class DbiTail extends Application {
                 if (file != null) {
                     Path relative = Paths.get(etcFolder.toFile().getAbsolutePath()).relativize(Paths.get(file.getAbsolutePath()));
                     treeFileName = "etc/" + relative;
-                    
-                    if(!treeFileName.endsWith(".tree")){
+
+                    if (!treeFileName.endsWith(".tree")) {
                         treeFileName += ".tree";
                     }
 
@@ -840,9 +925,35 @@ public class DbiTail extends Application {
                     } catch (IOException e) {
                         logger.error("Error saving files tree file: " + treeFileName, e);
                     }
-                    
+
                     saveTreeToFile();
                 }
+
+                ArrayList<String> fileList = new ArrayList();
+                DbiTail.getTreeFileList(Paths.get("etc").toFile(), fileList);
+
+                choiceBoxTreeFile.setItems(FXCollections.observableArrayList(fileList));
+                int selectedIndexTreeFile = 0;
+
+                for (String item : (ObservableList<String>) choiceBoxTreeFile.getItems()) {
+
+                    String treeFileNameTmp = treeFileName;
+
+                    if (treeFileName.contains("/")) {
+                        treeFileNameTmp = treeFileNameTmp.substring(treeFileNameTmp.lastIndexOf("/") + 1);
+                    }
+
+                    if (item.equals(treeFileNameTmp)) {
+                        break;
+                    }
+                    selectedIndexTreeFile++;
+                }
+
+                if (selectedIndexTreeFile >= choiceBoxTreeFile.getItems().size()) {
+                    selectedIndexTreeFile = 0;
+                }
+
+                choiceBoxTreeFile.getSelectionModel().select(selectedIndexTreeFile);
             }
         }
         );
@@ -1113,6 +1224,7 @@ public class DbiTail extends Application {
         toolBar.setPadding(new Insets(13, 16, 13, 16));
 
         toolBar.getChildren().add(btOpenTree);
+        toolBar.getChildren().add(choiceBoxTreeFile);
         toolBar.getChildren().add(btSaveTree);
         toolBar.getChildren().add(btAdd);
         toolBar.getChildren().add(btRemove);
@@ -1202,6 +1314,8 @@ public class DbiTail extends Application {
 
         initTreeRoot();
 
+        treePane = new StackPane();
+
         treeView = TreeViewBuilder.<String>create().root(treeRoot).build();
 
         treeView.setEditable(true);
@@ -1215,8 +1329,6 @@ public class DbiTail extends Application {
                     }
                 }
         );
-
-        treePane = new StackPane();
 
         treePane.getChildren().add(treeView);
 
@@ -1371,7 +1483,7 @@ public class DbiTail extends Application {
 
         Path filePath = Paths.get(treeFileName);
 
-        logger.trace("Saving tree file to: " + treeFileName );
+        logger.trace("Saving tree file to: " + treeFileName);
 
         try {
             Files.deleteIfExists(filePath);
@@ -1613,6 +1725,19 @@ public class DbiTail extends Application {
         File[] fList = directory.listFiles();
         for (File file : fList) {
             if (file.isFile() && file.getName().endsWith(".cfg")) {
+                files.add(file.getName());
+            } else if (file.isDirectory()) {
+                getConfigurationFileList(file, files);
+            }
+        }
+    }
+
+    public static void getTreeFileList(File directory, ArrayList<String> files) {
+
+        // get all the files from a directory
+        File[] fList = directory.listFiles();
+        for (File file : fList) {
+            if (file.isFile() && file.getName().endsWith(".tree")) {
                 files.add(file.getName());
             } else if (file.isDirectory()) {
                 getConfigurationFileList(file, files);
