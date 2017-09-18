@@ -82,6 +82,7 @@ public class WindowTextConsole {
     private TextField searchText;
     private Button searchButton;
     private CheckBox caseSensitive = new CheckBox("Match Case");
+    private CheckBox wholeWord = new CheckBox("Whole Word");
 
     private Button zoomIn;
     private Button zoomOut;
@@ -357,7 +358,7 @@ public class WindowTextConsole {
 
                     @Override
                     public void handle(ActionEvent event) {
-                        outputConsole.search(searchText.getText(), caseSensitive.isSelected());
+                        outputConsole.search(searchText.getText(), caseSensitive.isSelected(), wholeWord.isSelected());
                     }
                 }
         );
@@ -422,6 +423,8 @@ public class WindowTextConsole {
         Separator separator7 = new Separator();
         separator7.setOrientation(Orientation.VERTICAL);
 
+        wholeWord.setSelected(true);
+
         toolbar.getItems().add(start);
         toolbar.getItems().add(pause);
         toolbar.getItems().add(stop);
@@ -441,6 +444,7 @@ public class WindowTextConsole {
         toolbar.getItems().add(searchText);
         toolbar.getItems().add(searchButton);
         toolbar.getItems().add(caseSensitive);
+        toolbar.getItems().add(wholeWord);
         toolbar.getItems().add(separator7);
         toolbar.getItems().add(zoomOut);
         toolbar.getItems().add(zoomReset);
