@@ -38,7 +38,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
@@ -81,8 +83,10 @@ public class WindowTextConsole {
     private Button insertLine;
     private TextField searchText;
     private Button searchButton;
-    private CheckBox caseSensitive = new CheckBox("Match Case");
-    private CheckBox wholeWord = new CheckBox("Whole Word");
+    private CheckBox autoSearch;
+    private CheckBox caseSensitive;
+    private CheckBox wholeWord;
+    private MenuButton searchMenuButton;
 
     private Button zoomIn;
     private Button zoomOut;
@@ -363,6 +367,22 @@ public class WindowTextConsole {
                 }
         );
 
+        searchMenuButton = new MenuButton();
+        searchMenuButton.setGraphic(new ImageView(new Image("magnifier-empty.png")));
+        autoSearch = new CheckBox("Auto-Search");
+        CustomMenuItem smb_item_autoSearch = new CustomMenuItem(autoSearch);
+        smb_item_autoSearch.setHideOnClick(false);
+
+        caseSensitive = new CheckBox("Match Case");
+        CustomMenuItem smb_item_caseSensitive = new CustomMenuItem(caseSensitive);
+        smb_item_caseSensitive.setHideOnClick(false);
+
+        wholeWord = new CheckBox("Whole Word");
+        CustomMenuItem smb_item_wholeWord = new CustomMenuItem(wholeWord);
+        smb_item_wholeWord.setHideOnClick(false);
+
+        searchMenuButton.getItems().setAll(smb_item_autoSearch, smb_item_caseSensitive, smb_item_wholeWord);
+
         zoomIn = new Button();
         zoomIn.setGraphic(new ImageView(new Image("magnifier-zoom-in.png")));
         zoomIn.setTooltip(new Tooltip("Zoom In"));
@@ -442,9 +462,8 @@ public class WindowTextConsole {
         toolbar.getItems().add(insertLine);
         toolbar.getItems().add(separator6);
         toolbar.getItems().add(searchText);
+        toolbar.getItems().add(searchMenuButton);
         toolbar.getItems().add(searchButton);
-        toolbar.getItems().add(caseSensitive);
-        toolbar.getItems().add(wholeWord);
         toolbar.getItems().add(separator7);
         toolbar.getItems().add(zoomOut);
         toolbar.getItems().add(zoomReset);
