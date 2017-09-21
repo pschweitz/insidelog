@@ -1,3 +1,6 @@
+This project is only a fork of DBI Tail.
+Downloads: https://github.com/marcin-jozwikowski/DBITail/releases
+
 DBI Tail is a tool created by Philippe Schweitzer
 https://ch.linkedin.com/pub/philippe-schweitzer/87/ab/2bb
 
