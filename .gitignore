@@ -4,3 +4,6 @@
 /UserManual.pptx
 /build.xml
 /manifest.mf
+.idea
+out
+DBITail.iml
