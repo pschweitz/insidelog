@@ -34,7 +34,7 @@ public interface IOutputConsole {
     public void saveTextContent(String destinationFile); 
     public void copyStyledContent(); 
     public void copyTextContent();    
-    public void search(String text, boolean caseSensitive, boolean wholeWord);
+    public void search();
     public void zoomIn();    
     public void zoomOut();   
     public void zoomReset();       

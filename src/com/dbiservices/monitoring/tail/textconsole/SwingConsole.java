@@ -288,6 +288,9 @@ public class SwingConsole extends StackPane implements IOutputConsole {
                                 undo.die();
                             }
                         }
+                        if (informationObject.getWindowTextConsole().getSettings().isAutoSearch()) {
+                            search();
+                        }
                     } else {
                         println(content);
                     }
@@ -548,7 +551,8 @@ public class SwingConsole extends StackPane implements IOutputConsole {
     }
 
     @Override
-    public void search(String textToSearch, boolean caseSensitive, boolean wholeWord) {
+    public void search() {
+        String textToSearch = this.informationObject.getWindowTextConsole().getSettings().getSearchTextField().getText();
 
         logger.debug("Search: " + textToSearch);
 
@@ -556,7 +560,7 @@ public class SwingConsole extends StackPane implements IOutputConsole {
         highlighter.removeAllHighlights();
 
         List<String> stringsToSearchFor;
-        if (wholeWord) {
+        if (this.informationObject.getWindowTextConsole().getSettings().isWholeWord()) {
             stringsToSearchFor = Arrays.asList(textToSearch);
         } else {
             stringsToSearchFor = Arrays.asList(textToSearch.split("\\s+"));
@@ -570,7 +574,7 @@ public class SwingConsole extends StackPane implements IOutputConsole {
                 try {
                     contText = doc.getText(0, doc.getLength());
 
-                    if (!caseSensitive) {
+                    if (!this.informationObject.getWindowTextConsole().getSettings().isCaseSensitive()) {
                         contText = contText.toLowerCase();
                         text = text.toLowerCase();
                     }

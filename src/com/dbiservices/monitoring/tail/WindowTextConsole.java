@@ -81,12 +81,7 @@ public class WindowTextConsole {
     private Button copyRTF;
     private Button btColorChooser;
     private Button insertLine;
-    private TextField searchText;
     private Button searchButton;
-    private CheckBox autoSearch;
-    private CheckBox caseSensitive;
-    private CheckBox wholeWord;
-    private MenuButton searchMenuButton;
 
     private Button zoomIn;
     private Button zoomOut;
@@ -101,6 +96,8 @@ public class WindowTextConsole {
 
     private File lastSelected = null;
 
+    private WindowTextConsoleSettings settings = new WindowTextConsoleSettings();
+
     BorderPane pane;
 
     public WindowTextConsole(String name, InformationObject informationObject) {
@@ -109,6 +106,10 @@ public class WindowTextConsole {
         textConsoleStage.setTitle(title);
         textConsoleStage.getIcons().add(new Image("tail_small_logo.png"));
         updateButtons();
+    }
+
+    public WindowTextConsoleSettings getSettings() {
+        return settings;
     }
 
     private WindowTextConsole(InformationObject informationObject) {
@@ -348,10 +349,6 @@ public class WindowTextConsole {
                 }
         );
 
-        searchText = new TextField();
-        searchText.setPrefWidth(100);
-        searchText.setPrefHeight(30);
-
         searchButton = new Button();
         searchButton.setGraphic(new ImageView(new Image("magnifier-zoom-actual-equal.png")));
         searchButton.setTooltip(new Tooltip("Search for text"));
@@ -362,26 +359,10 @@ public class WindowTextConsole {
 
                     @Override
                     public void handle(ActionEvent event) {
-                        outputConsole.search(searchText.getText(), caseSensitive.isSelected(), wholeWord.isSelected());
+                        outputConsole.search();
                     }
                 }
         );
-
-        searchMenuButton = new MenuButton();
-        searchMenuButton.setGraphic(new ImageView(new Image("magnifier-empty.png")));
-        autoSearch = new CheckBox("Auto-Search");
-        CustomMenuItem smb_item_autoSearch = new CustomMenuItem(autoSearch);
-        smb_item_autoSearch.setHideOnClick(false);
-
-        caseSensitive = new CheckBox("Match Case");
-        CustomMenuItem smb_item_caseSensitive = new CustomMenuItem(caseSensitive);
-        smb_item_caseSensitive.setHideOnClick(false);
-
-        wholeWord = new CheckBox("Whole Word");
-        CustomMenuItem smb_item_wholeWord = new CustomMenuItem(wholeWord);
-        smb_item_wholeWord.setHideOnClick(false);
-
-        searchMenuButton.getItems().setAll(smb_item_autoSearch, smb_item_caseSensitive, smb_item_wholeWord);
 
         zoomIn = new Button();
         zoomIn.setGraphic(new ImageView(new Image("magnifier-zoom-in.png")));
@@ -443,8 +424,6 @@ public class WindowTextConsole {
         Separator separator7 = new Separator();
         separator7.setOrientation(Orientation.VERTICAL);
 
-        wholeWord.setSelected(true);
-
         toolbar.getItems().add(start);
         toolbar.getItems().add(pause);
         toolbar.getItems().add(stop);
@@ -461,8 +440,8 @@ public class WindowTextConsole {
         toolbar.getItems().add(separator5);
         toolbar.getItems().add(insertLine);
         toolbar.getItems().add(separator6);
-        toolbar.getItems().add(searchText);
-        toolbar.getItems().add(searchMenuButton);
+        toolbar.getItems().add(settings.getSearchTextField());
+        toolbar.getItems().add(settings.getMenuButton());
         toolbar.getItems().add(searchButton);
         toolbar.getItems().add(separator7);
         toolbar.getItems().add(zoomOut);
