@@ -108,25 +108,9 @@ public class WindowTextConsole {
         updateButtons();
     }
 
-    public WindowTextConsoleSettings getSettings() {
-        return settings;
-    }
-
     private WindowTextConsole(InformationObject informationObject) {
         this.informationObject = informationObject;
-        switch (outputType) {
-
-            case JLIST:
-
-                break;
-
-            case SWINGCONSOLE:
-
-                if (informationObject != null) {
-                    outputConsole = new SwingConsole(informationObject);
-                }
-                break;
-        }
+        createOrClearOutputConsole();
 
         toolbar = new ToolBar();
         statusBar = new HBox();
@@ -480,6 +464,31 @@ public class WindowTextConsole {
         );
     }
 
+    private void createOrClearOutputConsole() {
+        if (outputConsole != null) {
+            outputConsole.clear();
+            double height = ((Pane) getConsole()).getHeight();
+            double width = ((Pane) getConsole()).getWidth();
+
+            ((Pane) getConsole()).setPrefSize(width, height);
+        }
+
+        switch (outputType) {
+
+            case JLIST:
+
+                break;
+
+            case SWINGCONSOLE:
+
+                if (informationObject != null) {
+                    outputConsole = new SwingConsole(informationObject);
+                    ((SwingConsole) outputConsole).setSettings(settings);
+                }
+                break;
+        }
+    }
+
     public boolean isRunning() {
         return isRunning;
     }
@@ -571,26 +580,7 @@ public class WindowTextConsole {
     }
 
     public void clear() {
-
-        if (outputConsole != null) {
-            outputConsole.clear();
-            double height = ((Pane) getConsole()).getHeight();
-            double width = ((Pane) getConsole()).getWidth();
-
-            ((Pane) getConsole()).setPrefSize(width, height);
-        }
-        switch (outputType) {
-
-            case JLIST:
-
-                break;
-
-            case SWINGCONSOLE:
-
-                outputConsole = new SwingConsole(informationObject);
-                break;
-
-        }
+        createOrClearOutputConsole();
 
         pane.setCenter((Parent) getConsole());
 

@@ -23,6 +23,7 @@ package com.dbiservices.monitoring.tail.textconsole;
  */
 import com.dbiservices.monitoring.tail.InformationObject;
 import com.dbiservices.monitoring.tail.PatternColorConfiguration;
+import com.dbiservices.monitoring.tail.WindowTextConsoleSettings;
 import com.dbiservices.tools.Logger;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -107,6 +108,8 @@ public class SwingConsole extends StackPane implements IOutputConsole {
 
     private InformationObject informationObject;
 
+    private WindowTextConsoleSettings settings;
+
     public SwingConsole(InformationObject informationObject) {
         super();
 
@@ -173,6 +176,10 @@ public class SwingConsole extends StackPane implements IOutputConsole {
         });
 
         getChildren().add(swingNode);
+    }
+
+    public void setSettings(WindowTextConsoleSettings settings) {
+        this.settings = settings;
     }
 
     public void println(String message, Color color) {
@@ -288,7 +295,7 @@ public class SwingConsole extends StackPane implements IOutputConsole {
                                 undo.die();
                             }
                         }
-                        if (informationObject.getWindowTextConsole().getSettings().isAutoSearch()) {
+                        if (settings.isAutoSearch()) {
                             search();
                         }
                     } else {
@@ -552,7 +559,7 @@ public class SwingConsole extends StackPane implements IOutputConsole {
 
     @Override
     public void search() {
-        String textToSearch = this.informationObject.getWindowTextConsole().getSettings().getSearchTextField().getText();
+        String textToSearch = settings.getSearchTextField().getText();
 
         logger.debug("Search: " + textToSearch);
 
@@ -560,7 +567,7 @@ public class SwingConsole extends StackPane implements IOutputConsole {
         highlighter.removeAllHighlights();
 
         List<String> stringsToSearchFor;
-        if (this.informationObject.getWindowTextConsole().getSettings().isWholeWord()) {
+        if (settings.isWholeWord()) {
             stringsToSearchFor = Arrays.asList(textToSearch);
         } else {
             stringsToSearchFor = Arrays.asList(textToSearch.split("\\s+"));
@@ -574,7 +581,7 @@ public class SwingConsole extends StackPane implements IOutputConsole {
                 try {
                     contText = doc.getText(0, doc.getLength());
 
-                    if (!this.informationObject.getWindowTextConsole().getSettings().isCaseSensitive()) {
+                    if (!settings.isCaseSensitive()) {
                         contText = contText.toLowerCase();
                         text = text.toLowerCase();
                     }

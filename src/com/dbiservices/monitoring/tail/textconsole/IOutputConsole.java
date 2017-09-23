@@ -24,6 +24,7 @@ package com.dbiservices.monitoring.tail.textconsole;
  */
 
 import com.dbiservices.monitoring.tail.InformationObject;
+import com.dbiservices.monitoring.tail.WindowTextConsoleSettings;
 
 public interface IOutputConsole {
     
@@ -39,4 +40,5 @@ public interface IOutputConsole {
     public void zoomOut();   
     public void zoomReset();       
     public void setInformationObject(InformationObject informationObject);
+    public void setSettings(WindowTextConsoleSettings settings);
 }
