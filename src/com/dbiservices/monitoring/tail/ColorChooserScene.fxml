@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="373.0" prefWidth="663.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TextField fx:id="patternText" layoutX="39.0" layoutY="125.0" prefHeight="25.0" prefWidth="99.0" />
+      <ColorPicker fx:id="patternColor" layoutX="39.0" layoutY="168.0" prefHeight="25.0" prefWidth="99.0" />
+      <Button fx:id="addButton" layoutX="175.0" layoutY="127.0" mnemonicParsing="false" onAction="#addButtonAction" prefHeight="25.0" prefWidth="99.0" text="Add &gt;&gt;" />
+      <Button fx:id="removeButton" layoutX="175.0" layoutY="166.0" mnemonicParsing="false" onAction="#removeButtonAction" prefHeight="25.0" prefWidth="99.0" text="&lt;&lt; Remove" />
+      <TableView fx:id="colorTable" editable="true" layoutX="314.0" layoutY="83.0" prefHeight="194.0" prefWidth="260.0">
+        <columns>
+          <TableColumn fx:id="patternColumn" text="Pattern" />
+          <TableColumn fx:id="colorColumn" text="Color" />
+            <TableColumn fx:id="caseColumn" text="Match case" />
+        </columns>
+      </TableView>
+      <Label layoutX="39.0" layoutY="276.0" prefHeight="25.0" prefWidth="125.0" text="Backgroud color: " />
+      <ColorPicker fx:id="backgroundColor" layoutX="39.0" layoutY="312.0" prefHeight="25.0" prefWidth="99.0" />
+      <Label layoutX="39.0" layoutY="78.0" prefHeight="25.0" prefWidth="299.0" text="Fill in pattern to search and display color:" />
+      <ColorPicker fx:id="defaultColor" layoutX="175.0" layoutY="312.0" prefHeight="25.0" prefWidth="99.0" />
+      <Label layoutX="175.0" layoutY="276.0" prefHeight="25.0" prefWidth="125.0" text="Default color: " />
+      <Button fx:id="saveButton" layoutX="424.0" layoutY="312.0" mnemonicParsing="false" onAction="#saveButtonAction" prefHeight="25.0" prefWidth="92.0" text="Save" />
+      <Button fx:id="cancelButton" layoutX="300.0" layoutY="312.0" mnemonicParsing="false" onAction="#cancelButtonAction" prefHeight="25.0" prefWidth="92.0" text="Cancel" />
+      <Button fx:id="upButton" layoutX="601.0" layoutY="153.0" mnemonicParsing="false" onAction="#upButtonAction" prefHeight="25.0" prefWidth="30.0" />
+      <Button fx:id="downButton" layoutX="601.0" layoutY="191.0" mnemonicParsing="false" onAction="#downButtonAction" prefHeight="25.0" prefWidth="30.0" />
+      <ColorPicker fx:id="selectionColor" layoutX="39.0" layoutY="244.0" prefHeight="25.0" prefWidth="99.0" />
+      <Label layoutX="39.0" layoutY="208.0" prefHeight="25.0" prefWidth="125.0" text="Selection color: " />
+      <Label layoutX="174.0" layoutY="208.0" prefHeight="25.0" prefWidth="125.0" text="Search color: " />
+      <ColorPicker fx:id="searchColor" layoutX="174.0" layoutY="244.0" prefHeight="25.0" prefWidth="99.0" />
+      <Label layoutX="41.0" layoutY="29.0" prefHeight="25.0" prefWidth="99.0" text="Template name:" />
+      <TextField fx:id="fontSize" layoutX="580.0" layoutY="29.0" prefHeight="25.0" prefWidth="43.0" />
+      <Label layoutX="327.0" layoutY="29.0" prefHeight="25.0" prefWidth="30.0" text="Font:" />
+      <ChoiceBox fx:id="fontName" layoutX="366.0" layoutY="29.0" prefHeight="25.0" prefWidth="117.0" />
+      <Label layoutX="512.0" layoutY="29.0" prefHeight="25.0" prefWidth="62.0" text="Font size:" />
+      <Button fx:id="saveAsButton" layoutX="543.0" layoutY="312.0" mnemonicParsing="false" onAction="#saveAsButtonAction" prefHeight="25.0" prefWidth="92.0" text="Save As..." />
+      <ChoiceBox fx:id="templateName" layoutX="141.0" layoutY="29.0" prefHeight="25.0" prefWidth="157.0" />
+   </children>
+</AnchorPane>
