@@ -1,0 +1,7 @@
+"catalina.out";"Monitoring/catalina.out";"/users/SOFT/apache-tomcat-8.5.9/logs/catalina.out";"100";"500";"true";"UTF-8";"etc/default.cfg"
+"access.log";"OpenERP/DEV/access.log";"ssh://root@debian-erp:/var/log/openerp/access.log";"100";"500";"true";"Auto detect";"etc/default.cfg"
+"error.log";"OpenERP/DEV/error.log";"ssh://root@debian-erp:/var/log/openerp/error.log";"100";"500";"true";"US-ASCII";"etc/default.cfg"
+"openerp-server.log";"OpenERP/DEV/openerp-server.log";"ssh://root@debian-erp:/var/log/openerp/openerp-server.log";"100";"500";"true";"US-ASCII";"etc/default.cfg"
+"openerp-server.log";"OpenERP/PROD/openerp-server.log";"ssh://root@vmproderp02:/var/log/openerp/openerp-server.log";"100";"500";"true";"US-ASCII";"etc/default.cfg"
+"error.log";"OpenERP/TEST/error.log";"ssh://root:etc/id_rsa@vmtesterp01:/var/log/openerp/error.log";"100";"500";"true";"US-ASCII";"etc/default.cfg"
+"openerp-server.log";"OpenERP/TEST/openerp-server.log";"ssh://root:etc/id_rsa@vmtesterp01:/var/log/openerp/openerp-server.log";"100";"500";"true";"US-ASCII";"etc/default.cfg"

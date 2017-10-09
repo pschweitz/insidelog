@@ -1,0 +1,4 @@
+"odoo10.log";"Odoo/odoo10.log";"ssh://odoo@debian-odoo10:/var/log/odoo10/odoo10.log";"100";"500";"true";"US-ASCII";"etc/default.cfg"
+"odoo8.log";"Odoo/odoo8.log";"ssh://odoo@debian-odoo10:/var/log/odoo8/odoo8.log";"100";"500";"true";"US-ASCII";"etc/default.cfg"
+"odoo9.log";"Odoo/odoo9.log";"ssh://odoo@debian-odoo10:/var/log/odoo9/odoo9.log";"100";"500";"true";"US-ASCII";"etc/default.cfg"
+
