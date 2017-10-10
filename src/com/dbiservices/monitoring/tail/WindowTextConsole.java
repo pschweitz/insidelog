@@ -407,6 +407,9 @@ public class WindowTextConsole {
         separator6.setOrientation(Orientation.VERTICAL);
         Separator separator7 = new Separator();
         separator7.setOrientation(Orientation.VERTICAL);
+        
+        
+        logger.warning("BUILD Toolbar");
 
         toolbar.getItems().add(start);
         toolbar.getItems().add(pause);

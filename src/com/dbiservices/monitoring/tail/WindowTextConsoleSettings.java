@@ -1,5 +1,7 @@
 package com.dbiservices.monitoring.tail;
 
+import com.dbiservices.monitoring.tail.textconsole.SwingConsole;
+import com.dbiservices.tools.Logger;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.MenuButton;
@@ -8,6 +10,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class WindowTextConsoleSettings {
+    
+    private static final Logger logger = Logger.getLogger(WindowTextConsoleSettings.class);
+    
     private CheckBox autoSearch;
     private CheckBox caseSensitive;
     private CheckBox wholeWord;
@@ -38,6 +43,10 @@ public class WindowTextConsoleSettings {
     }
 
     public MenuButton getMenuButton() {
+        
+        System.out.println("GET MENU");
+        logger.warning("GET MENU");
+        
         return searchMenuButton;
     }
 
@@ -46,6 +55,9 @@ public class WindowTextConsoleSettings {
     public boolean isWholeWord() {return wholeWord.isSelected();}
 
     public TextField getSearchTextField() {
+        
+        logger.warning("GET SEARCH TEXT FIELD");
+        System.out.println("GET SEARCH TEXT FIELD");
         return searchText;
     }
 }
