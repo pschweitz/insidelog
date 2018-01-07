@@ -21,8 +21,9 @@ package com.interactive.monitoring.tail.textconsole;
  * @version 1.1
  * @since 16.11.2015
  */
-import com.interactive.monitoring.tail.InformationObject;
-import com.interactive.monitoring.tail.PatternColorConfiguration;
+import com.interactive.insidelog.InformationObject;
+import com.interactive.insidelog.PatternColorConfiguration;
+import com.interactive.insidelog.WindowTextConsoleSettings;
 import com.interactive.tools.Logger;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -47,6 +48,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.StringTokenizer;
 import javafx.embed.swing.SwingNode;
 import javafx.scene.layout.StackPane;
@@ -104,6 +107,8 @@ public class SwingConsole extends StackPane implements IOutputConsole {
     private int insertCount = 0;
 
     private InformationObject informationObject;
+
+    private WindowTextConsoleSettings settings;
 
     public SwingConsole(InformationObject informationObject) {
         super();
@@ -171,6 +176,10 @@ public class SwingConsole extends StackPane implements IOutputConsole {
         });
 
         getChildren().add(swingNode);
+    }
+
+    public void setSettings(WindowTextConsoleSettings settings) {
+        this.settings = settings;
     }
 
     public void println(String message, Color color) {
@@ -285,6 +294,9 @@ public class SwingConsole extends StackPane implements IOutputConsole {
                                 undo.discardAllEdits();
                                 undo.die();
                             }
+                        }
+                        if (settings.isAutoSearch()) {
+                            search();
                         }
                     } else {
                         println(content);
@@ -546,37 +558,48 @@ public class SwingConsole extends StackPane implements IOutputConsole {
     }
 
     @Override
-    public void search(String text, boolean caseSensitive) {
+    public void search() {
+        String textToSearch = settings.getSearchTextField().getText();
 
-        logger.debug("Search: " + text);
+        logger.debug("Search: " + textToSearch);
 
         DefaultHighlighter highlighter = (DefaultHighlighter) textPane.getHighlighter();
         highlighter.removeAllHighlights();
-        if (!text.equals("")) {
-            DefaultHighlightPainter hPainter = new DefaultHighlightPainter(informationObject.getColorConfiguration().getSearchSwingColor());
-            String contText = "";
 
-            try {
-                contText = doc.getText(0, doc.getLength());
+        List<String> stringsToSearchFor;
+        if (settings.isWholeWord()) {
+            stringsToSearchFor = Arrays.asList(textToSearch);
+        } else {
+            stringsToSearchFor = Arrays.asList(textToSearch.split("\\s+"));
+        }
 
-                if (!caseSensitive) {
-                    contText = contText.toLowerCase();
-                    text = text.toLowerCase();
-                }
-
-            } catch (BadLocationException ex) {
-                logger.error("Error searching content: " + text, ex);
-            }
-
-            int index = 0;
-
-            while ((index = contText.indexOf(text, index)) > -1) {
+        for (String text : stringsToSearchFor) {
+            if (!text.equals("")) {
+                DefaultHighlightPainter hPainter = new DefaultHighlightPainter(informationObject.getColorConfiguration().getSearchSwingColor());
+                String contText = "";
 
                 try {
-                    highlighter.addHighlight(index, text.length() + index, hPainter);
-                    index = index + text.length();
+                    contText = doc.getText(0, doc.getLength());
+
+                    if (!settings.isCaseSensitive()) {
+                        contText = contText.toLowerCase();
+                        text = text.toLowerCase();
+                    }
+
                 } catch (BadLocationException ex) {
                     logger.error("Error searching content: " + text, ex);
+                }
+
+                int index = 0;
+
+                while ((index = contText.indexOf(text, index)) > -1) {
+
+                    try {
+                        highlighter.addHighlight(index, text.length() + index, hPainter);
+                        index = index + text.length();
+                    } catch (BadLocationException ex) {
+                        logger.error("Error searching content: " + text, ex);
+                    }
                 }
             }
         }

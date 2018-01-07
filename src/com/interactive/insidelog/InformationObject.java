@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dbiservices.monitoring.tail;
+package com.interactive.insidelog;
 
 /**
  *
@@ -21,9 +21,9 @@ package com.dbiservices.monitoring.tail;
  * @version 1.1
  * @since 16.11.2015
  */
-import com.dbiservices.monitoring.common.schedulerservice.ServiceScheduler;
-import com.dbiservices.tools.ApplicationContext;
-import com.dbiservices.tools.Logger;
+import com.interactive.schedulerservice.ServiceScheduler;
+import com.interactive.tools.ApplicationContext;
+import com.interactive.tools.Logger;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.StringTokenizer;
@@ -44,7 +44,7 @@ public class InformationObject implements Serializable {
     private Charset charset = null;
     private long lastFileLength = 0;
     private int elementCount = 0;
-    private String fileColors = DbiTail.colorFileName;
+    private String fileColors = InSideLog.colorFileName;
     private ColorConfiguration colorConfiguration = null;
 
     public InformationObject(String displayName, String fullName, String filePath, int bufferSize, int frequency, boolean displayColors, String fileColors) {
@@ -154,6 +154,10 @@ public class InformationObject implements Serializable {
 
     public int getScheduleType() {
         return scheduleType;
+    }
+
+    public void setScheduleType(int scheduleType) {
+        this.scheduleType = scheduleType;
     }
 
     public boolean isEnabled() {

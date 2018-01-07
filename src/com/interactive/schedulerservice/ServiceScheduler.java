@@ -21,7 +21,7 @@ package com.interactive.schedulerservice;
  * @version 1.1
  * @since 16.11.2015
  */
-import com.interactive.monitoring.tail.TailSSH;
+import com.interactive.insidelog.TailSSH;
 import com.interactive.tools.Logger;
 import java.util.Hashtable;
 
@@ -45,9 +45,16 @@ public class ServiceScheduler {
 
         if (TailSSH.class.isAssignableFrom(scheduledDefinition.getiScheduledService().getClass())) {
             success = ((TailSSH) scheduledDefinition.getiScheduledService()).connect();
+            
+            String OS = System.getProperty("os.name").toLowerCase();
+            
+            if(scheduledDefinition.getInformationObject().getWindowTextConsole() !=null && (OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0 )){
+                scheduledDefinition.getInformationObject().getWindowTextConsole().hide();
+                scheduledDefinition.getInformationObject().getWindowTextConsole().show();
+            }
         }
 
-        if (success) {
+        if (success) {        
             logger.info("Start read of file: " + scheduledDefinition.getDisplayName());
             scheduledDefinitionPool.put(fullName, scheduledDefinition);
         }

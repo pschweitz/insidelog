@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dbiservices.monitoring.tail;
+package com.interactive.insidelog;
 
 /**
  *
@@ -21,12 +21,12 @@ package com.dbiservices.monitoring.tail;
  * @version 1.1
  * @since 16.11.2015
  */
-import com.dbiservices.monitoring.common.schedulerservice.IScheduledService;
-import com.dbiservices.monitoring.common.schedulerservice.ScheduledDefinition;
-import com.dbiservices.monitoring.common.schedulerservice.ServiceScheduler;
-import com.dbiservices.monitoring.tail.textconsole.IOutputConsole;
-import com.dbiservices.monitoring.tail.textconsole.SwingConsole;
-import com.dbiservices.tools.Logger;
+import com.interactive.schedulerservice.IScheduledService;
+import com.interactive.schedulerservice.ScheduledDefinition;
+import com.interactive.schedulerservice.ServiceScheduler;
+import com.interactive.monitoring.tail.textconsole.IOutputConsole;
+import com.interactive.monitoring.tail.textconsole.SwingConsole;
+import com.interactive.tools.Logger;
 import java.io.File;
 import java.util.concurrent.Executor;
 import javafx.application.Platform;
@@ -65,7 +65,7 @@ public class WindowTextConsole {
     private static final int SWINGCONSOLE = 1;
 
     private IOutputConsole outputConsole;
-    private Stage textConsoleStage;
+    public Stage textConsoleStage;
     private int outputType = SWINGCONSOLE;
 
     private String title = "";
@@ -408,9 +408,6 @@ public class WindowTextConsole {
         Separator separator7 = new Separator();
         separator7.setOrientation(Orientation.VERTICAL);
         
-        
-        logger.warning("BUILD Toolbar");
-
         toolbar.getItems().add(start);
         toolbar.getItems().add(pause);
         toolbar.getItems().add(stop);
@@ -459,12 +456,12 @@ public class WindowTextConsole {
                 isRunning = false;
                 updateButtons();
 
-                if (!DbiTail.showMainStage) {
+                if (!InSideLog.showMainStage) {
                     System.exit(0);
                 }
             }
         }
-        );
+        );     
     }
 
     private void createOrClearOutputConsole() {
@@ -489,7 +486,7 @@ public class WindowTextConsole {
                     ((SwingConsole) outputConsole).setSettings(settings);
                 }
                 break;
-        }
+        }        
     }
 
     public boolean isRunning() {
@@ -545,6 +542,7 @@ public class WindowTextConsole {
         logger.info("Open of file: " + informationObject.getFullName());
 
         informationObject.setOffset(-1);
+        informationObject.setScheduleType(ServiceScheduler.MATURITY);
         TailFile tail = new TailFile(informationObject);
 
         if (!ServiceScheduler.getScheduledDefinitionPool().containsKey(informationObject.getFullName())) {
@@ -589,7 +587,7 @@ public class WindowTextConsole {
 
         textConsoleScene.setRoot(new BorderPane());
         textConsoleScene = new Scene(pane);
-        textConsoleStage.setScene(textConsoleScene);
+        textConsoleStage.setScene(textConsoleScene);        
     }
 
     private class ProcessExecutor implements Executor {

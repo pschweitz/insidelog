@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dbiservices.monitoring.tail;
+package com.interactive.insidelog;
 
 /**
  *
@@ -21,11 +21,11 @@ package com.dbiservices.monitoring.tail;
  * @version 1.1
  * @since 16.11.2015
  */
-import com.dbiservices.monitoring.common.schedulerservice.IScheduledService;
-import com.dbiservices.monitoring.common.schedulerservice.ScheduledDefinition;
-import com.dbiservices.monitoring.common.schedulerservice.ServiceScheduler;
-import com.dbiservices.tools.ApplicationContext;
-import com.dbiservices.tools.Logger;
+import com.interactive.schedulerservice.IScheduledService;
+import com.interactive.schedulerservice.ScheduledDefinition;
+import com.interactive.schedulerservice.ServiceScheduler;
+import com.interactive.tools.ApplicationContext;
+import com.interactive.tools.Logger;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
@@ -83,7 +83,7 @@ public class TreeItemNode extends TreeItem<String> implements Serializable {
             String token = stringTokenizer.nextToken();
 
             if (rootNode.isUniqChild(token)) {
-                InformationObject informationObject = new InformationObject(token, token, null, 0, 0, false, DbiTail.colorFileName);
+                InformationObject informationObject = new InformationObject(token, token, null, 0, 0, false, InSideLog.colorFileName);
 
                 TreeItemNode treeItem = new TreeItemNode(informationObject, true);
                 treeItem.setGraphic(new ImageView(new Image("folder-horizontal.png")));
@@ -106,7 +106,7 @@ public class TreeItemNode extends TreeItem<String> implements Serializable {
 
     public void startTailSchedule() {
         if (!ServiceScheduler.getScheduledDefinitionPool().containsKey(informationObject.getFullName())) {
-            ServiceScheduler.addScheduledDefinition(informationObject.getFullName(), new ScheduledDefinition(informationObject, tailThread));
+            ServiceScheduler.addScheduledDefinition(informationObject.getFullName(), new ScheduledDefinition(informationObject, tailThread));            
         }
     }
 
@@ -193,7 +193,7 @@ public class TreeItemNode extends TreeItem<String> implements Serializable {
 
             logger.debug("treeItemNode: " + treeItemNode.informationObject.getDisplayName());
             if (treeItemNode.informationObject.getColorConfiguration().templateName.equals(colorConfiguration.templateName)
-                    && !treeItemNode.informationObject.getColorConfiguration().templateName.equals(DbiTail.colorFileName)) {
+                    && !treeItemNode.informationObject.getColorConfiguration().templateName.equals(InSideLog.colorFileName)) {
 
                 logger.debug("refresh color configuration: " + treeItemNode.informationObject.getDisplayName());
 

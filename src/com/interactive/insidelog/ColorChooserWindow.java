@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.dbiservices.monitoring.tail;
+package com.interactive.insidelog;
 
 /**
  *
@@ -23,7 +23,7 @@ package com.dbiservices.monitoring.tail;
  * @since   16.11.2015
  */
 
-import com.dbiservices.tools.Logger;
+import com.interactive.tools.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -36,7 +36,7 @@ public class ColorChooserWindow extends Application {
 
     private final InformationObject informationObject;
 
-    private String fileColors = DbiTail.colorFileName;
+    private String fileColors = InSideLog.colorFileName;
 
     public ColorChooserWindow(InformationObject informationObject, String fileColors) {
         this.informationObject = informationObject;

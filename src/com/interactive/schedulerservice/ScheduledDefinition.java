@@ -21,7 +21,7 @@ package com.interactive.schedulerservice;
  * @version 1.1
  * @since 16.11.2015
  */
-import com.interactive.monitoring.tail.InformationObject;
+import com.interactive.insidelog.InformationObject;
 import com.interactive.tools.Logger;
 import java.util.Timer;
 import java.util.TimerTask;

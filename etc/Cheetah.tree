@@ -1,7 +1,0 @@
-"NETBEANS access.log";"cheetah/NETBEANS access.log";"/users/JAVA_PROJECT/R&D/CheetahWebserver/log/access.log";"100";"500";"true";"Auto detect";"etc/default.cfg"
-"TEST access.log";"cheetah/TEST access.log";"/users/JAVA_PROJECT/R&D/CheetahWebserver_TEST/log/access.log";"100";"500";"true";"Auto detect";"etc/default.cfg"
-"access.log";"cheetah/access.log";"/users/TMP/Cheetah/log/access.log";"100";"500";"true";"Auto detect";"etc/default.cfg"
-"cheetah.log";"cheetah/cheetah.log";"/users/TMP/Cheetah/log/cheetah.log";"100";"500";"true";"Auto detect";"etc/default.cfg"
-"out.log ODOO";"cheetah/out.log ODOO";"/users/JAVA_RELEASE/Cheetah_Odoo/out.log";"100";"500";"true";"Auto detect";"etc/Cheetah.cfg"
-"out.log TEST";"cheetah/out.log TEST";"/users/JAVA_RELEASE/Cheetah_test/out.log";"100";"500";"true";"Auto detect";"etc/Cheetah.cfg"
-

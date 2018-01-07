@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dbiservices.monitoring.tail;
+package com.interactive.insidelog;
 
 /**
  *
@@ -21,8 +21,8 @@ package com.dbiservices.monitoring.tail;
  * @version 1.1
  * @since 16.11.2015
  */
-import com.dbiservices.tools.ApplicationContext;
-import com.dbiservices.tools.Logger;
+import com.interactive.tools.ApplicationContext;
+import com.interactive.tools.Logger;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -119,7 +119,7 @@ public class ColorChooserWindowControler implements Initializable {
     private ColorConfiguration colorConfigurationEdit;
     private InformationObject informationObject;
 
-    private String fileColors = DbiTail.colorFileName;
+    private String fileColors = InSideLog.colorFileName;
 
     public ColorChooserWindowControler(InformationObject informationObject, String fileColors, Stage colorChooserWindowStage) {
 
@@ -175,7 +175,7 @@ public class ColorChooserWindowControler implements Initializable {
     private void fireSave() {
         ApplicationContext applicationContext = ApplicationContext.getInstance();
 
-        if (fileColors.equals(DbiTail.colorFileName) && informationObject.getFilePath().toString().equals(".")) {
+        if (fileColors.equals(InSideLog.colorFileName) && informationObject.getFilePath().toString().equals(".")) {
             if (applicationContext.containsKey("colorDefaultConfiguration")) {
                 applicationContext.remove("colorDefaultConfiguration");
             }
@@ -205,7 +205,7 @@ public class ColorChooserWindowControler implements Initializable {
 
         colorConfiguration.templateName = fileColors.substring("etc/".length());
         
-        if (fileColors.equals(DbiTail.colorFileName) && informationObject.getFilePath().toString().equals(".")) {
+        if (fileColors.equals(InSideLog.colorFileName) && informationObject.getFilePath().toString().equals(".")) {
             applicationContext.put("colorDefaultConfiguration", colorConfiguration);   
         } else {
             informationObject.setFileColors(fileColors);
@@ -215,8 +215,8 @@ public class ColorChooserWindowControler implements Initializable {
 
         informationObject.setColorConfiguration(colorConfiguration);
 
-        DbiTail.saveTreeToFile();
-        DbiTail.updateInformationObjetcs(colorConfiguration);
+        InSideLog.saveTreeToFile();
+        InSideLog.updateInformationObjetcs(colorConfiguration);
 
         colorChooserWindowStage.close();
     }
@@ -435,7 +435,7 @@ public class ColorChooserWindowControler implements Initializable {
         fontName.getSelectionModel().select(selectedIndex);
         
         ArrayList<String> fileList = new ArrayList();
-        DbiTail.getConfigurationFileList(Paths.get("etc").toFile(), fileList);
+        InSideLog.getConfigurationFileList(Paths.get("etc").toFile(), fileList);
 
         templateName.setItems(FXCollections.observableArrayList(fileList));
         int selectedIndexFile = 0;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.interactive.monitoring.tail;
+package com.interactive.insidelog;
 
 /**
  *
@@ -65,7 +65,7 @@ public class ColorConfiguration {
         colorConfigurationList = new ArrayList();
 
         if (!Files.exists(Paths.get(colorFileName))) {
-            colorFileName = Insidelog.colorFileName;
+            colorFileName = InSideLog.colorFileName;
         }
 
         if (Files.exists(Paths.get(colorFileName))) {
@@ -206,7 +206,7 @@ public class ColorConfiguration {
             saveColorToFile(colorFileName);            
         }
 
-        if (colorFileName.equals(Insidelog.colorFileName)) {
+        if (colorFileName.equals(InSideLog.colorFileName)) {
 
             ApplicationContext applicationContext = ApplicationContext.getInstance();
 

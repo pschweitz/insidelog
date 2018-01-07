@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.interactive.monitoring.tail;
+package com.interactive.insidelog;
 /**
  *
  * @author  Philippe Schweitzer
@@ -73,7 +73,7 @@ public class CharsetDetect extends Thread {
                         logger.info("Detected charset is in supported list !");
                         charset = charsetMap.get(encoding.toUpperCase());
                         this.informationObject.setCharset(charset);
-                        Insidelog.saveTreeToFile();
+                        InSideLog.saveTreeToFile();
                     }
                 } else {
                     logger.warning("No charset detected. Using default: " + charset.name());

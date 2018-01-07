@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dbiservices.monitoring.tail;
+package com.interactive.insidelog;
 
 /**
  *
@@ -21,8 +21,8 @@ package com.dbiservices.monitoring.tail;
  * @version 1.1
  * @since 16.11.2015
  */
-import com.dbiservices.monitoring.common.schedulerservice.IScheduledService;
-import com.dbiservices.tools.Logger;
+import com.interactive.schedulerservice.IScheduledService;
+import com.interactive.tools.Logger;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -137,6 +137,7 @@ public class TailSSH implements IScheduledService, Serializable {
         String user = "";
         String passwd = "";
         String privateKey = "";
+        int port = 22;
 
         try {
 
@@ -164,6 +165,15 @@ public class TailSSH implements IScheduledService, Serializable {
             } else {
                 host = filename.substring(0, filename.indexOf(':'));
                 filename = filename.substring(filename.indexOf(':') + 1);
+
+                if (filename.contains(":")) {
+                    try {
+                        port = Integer.parseInt(filename.substring(0, filename.indexOf(':')));
+                    } catch (Exception e) {
+                        logger.warning("Error reading port: \"" + filename.substring(0, filename.indexOf(':')) + "\"");
+                    }
+                    filename = filename.substring(filename.indexOf(':') + 1);
+                }
             }
 
             if (!user.equals("") && !host.equals("")) {
@@ -185,6 +195,7 @@ public class TailSSH implements IScheduledService, Serializable {
             }
 
             logger.debug("host: " + host);
+            logger.debug("port: " + port);
             logger.debug("user: " + user);
             logger.debug("password: ****** ");
             logger.debug("privateKey: " + privateKey);
@@ -196,7 +207,7 @@ public class TailSSH implements IScheduledService, Serializable {
             }
 
             if (openSession) {
-                session = jsch.getSession(user, host, 22);
+                session = jsch.getSession(user, host, port);
 
                 if (!privateKey.equals("")) {
                     jsch.addIdentity(privateKey);
@@ -315,7 +326,7 @@ public class TailSSH implements IScheduledService, Serializable {
                                 logger.debug("charset: " + input.substring(input.indexOf("charset=") + 8));
                                 try {
                                     informationObject.setCharset(Charset.forName(input.substring(input.indexOf("charset=") + 8)));
-                                    DbiTail.saveTreeToFile();
+                                    InSideLog.saveTreeToFile();
                                 } catch (Exception e) {
                                 }
                             }

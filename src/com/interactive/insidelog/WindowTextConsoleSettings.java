@@ -1,7 +1,7 @@
-package com.dbiservices.monitoring.tail;
+package com.interactive.insidelog;
 
-import com.dbiservices.monitoring.tail.textconsole.SwingConsole;
-import com.dbiservices.tools.Logger;
+import com.interactive.monitoring.tail.textconsole.SwingConsole;
+import com.interactive.tools.Logger;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.MenuButton;
@@ -43,10 +43,7 @@ public class WindowTextConsoleSettings {
     }
 
     public MenuButton getMenuButton() {
-        
-        System.out.println("GET MENU");
-        logger.warning("GET MENU");
-        
+                
         return searchMenuButton;
     }
 
@@ -56,8 +53,6 @@ public class WindowTextConsoleSettings {
 
     public TextField getSearchTextField() {
         
-        logger.warning("GET SEARCH TEXT FIELD");
-        System.out.println("GET SEARCH TEXT FIELD");
         return searchText;
     }
 }

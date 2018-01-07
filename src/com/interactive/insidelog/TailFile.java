@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dbiservices.monitoring.tail;
+package com.interactive.insidelog;
 
 /**
  *
@@ -21,8 +21,8 @@ package com.dbiservices.monitoring.tail;
  * @version 1.1
  * @since 16.11.2015
  */
-import com.dbiservices.monitoring.common.schedulerservice.IScheduledService;
-import com.dbiservices.tools.Logger;
+import com.interactive.schedulerservice.IScheduledService;
+import com.interactive.tools.Logger;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;

@@ -16,7 +16,7 @@
 
 package com.interactive.schedulerservice;
 
-import com.interactive.monitoring.tail.InformationObject;
+import com.interactive.insidelog.InformationObject;
 
 
 /**

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.interactive.monitoring.tail;
+package com.interactive.insidelog;
 
 /**
  *
@@ -100,12 +100,12 @@ import javafx.stage.FileChooser;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 
-public class Insidelog extends Application {
+public class InSideLog extends Application {
 
-    private static final Logger logger = Logger.getLogger(Insidelog.class);
+    private static final Logger logger = Logger.getLogger(InSideLog.class);
 
-    public int year = 2017;
-    public String version = "1.3";
+    public int year = 2018;
+    public String version = "1.4";
 
     private static String[] args;
     private static String treeFileName = "etc/" + ApplicationContext.getInstance().getString("tail.defaultTreeConfiguration");
@@ -156,9 +156,9 @@ public class Insidelog extends Application {
     private static TreeItemNode copiedTreeItemNode = null;
     private StackPane treePane;
 
-    private static Insidelog instance;
+    private static InSideLog instance;
 
-    public Insidelog() {
+    public InSideLog() {
         instance = this;
     }
 
@@ -176,7 +176,7 @@ public class Insidelog extends Application {
         }
 
         applicationContext.put("colorFileName", colorFileName);
-        applicationContext.put("insidelog", this);
+        applicationContext.put("InsideLog", this);
 
         ColorConfiguration colorDefaultConfiguration = new ColorConfiguration();
         applicationContext.put("colorDefaultConfiguration", colorDefaultConfiguration);
@@ -207,7 +207,7 @@ public class Insidelog extends Application {
     private void openSavedFile(String fileName) {
 
         ArrayList<String> fileList = new ArrayList();
-        Insidelog.getConfigurationFileList(Paths.get("etc").toFile(), fileList);
+        InSideLog.getConfigurationFileList(Paths.get("etc").toFile(), fileList);
 
         ChoiceDialog<String> dialog = new ChoiceDialog<>("etc/default.cfg", fileList);
         dialog.setTitle("Select applicatble color template");
@@ -217,6 +217,10 @@ public class Insidelog extends Application {
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()) {
             String colorFile = result.get();
+            
+            if(!colorFile.startsWith("etc")){
+                colorFile = "etc/" + colorFile;
+            }
 
             InformationObject informationObject = new InformationObject(fileName, fileName, fileName, 1000, 500, true, colorFile);
             ApplicationContext.getInstance().put(fileName, new WindowTextConsole(fileName, informationObject));
@@ -493,15 +497,15 @@ public class Insidelog extends Application {
         Image flexImage = new Image("tail_logo.png");
         ImageView imageView = new ImageView(flexImage);
         imageView.setPreserveRatio(true);
-        imageView.setFitHeight(80);
+        imageView.setFitHeight(75);
 
         Hyperlink linkInteractive = new Hyperlink();
-        linkInteractive.setText("Interactive");
+        linkInteractive.setText("in'teractive");
         linkInteractive.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
             public void handle(ActionEvent t) {
-                getHostServices().showDocument("http://www.in-teractive.com/");
+                getHostServices().showDocument("http://www.in-teractive.com");
             }
         });
 
@@ -556,15 +560,13 @@ public class Insidelog extends Application {
 
         vboxInformationRoot.getChildren().add(imageView);
         vboxInformationRoot.getChildren().add(new HBox());
-        //vboxInformationRoot.getChildren().add(new HBox());
+        vboxInformationRoot.getChildren().add(new HBox());
         vboxInformationRoot.getChildren().add(hboxText);
         vboxInformationRoot.getChildren().add(new HBox());
         vboxInformationRoot.getChildren().add(hboxInteractive);
         vboxInformationRoot.getChildren().add(new HBox());
-        //vboxInformationRoot.getChildren().add(new HBox());
         vboxInformationRoot.getChildren().add(hboxPHS);
         vboxInformationRoot.getChildren().add(new HBox());
-        //vboxInformationRoot.getChildren().add(new HBox());
         vboxInformationRoot.getChildren().add(hboxGitHub);
 
         vboxInformationRoot.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -830,7 +832,7 @@ public class Insidelog extends Application {
         );
 
         ArrayList<String> fileList = new ArrayList();
-        Insidelog.getTreeFileList(Paths.get("etc").toFile(), fileList);
+        InSideLog.getTreeFileList(Paths.get("etc").toFile(), fileList);
 
         choiceBoxTreeFile.setPrefHeight(30);
         choiceBoxTreeFile.setTooltip(new Tooltip("Switch files tree"));
@@ -930,7 +932,7 @@ public class Insidelog extends Application {
                 }
 
                 ArrayList<String> fileList = new ArrayList();
-                Insidelog.getTreeFileList(Paths.get("etc").toFile(), fileList);
+                InSideLog.getTreeFileList(Paths.get("etc").toFile(), fileList);
 
                 choiceBoxTreeFile.setItems(FXCollections.observableArrayList(fileList));
                 int selectedIndexTreeFile = 0;
@@ -1344,7 +1346,7 @@ public class Insidelog extends Application {
     private void initTreeRoot() {
 
         if (treeRoot == null) {
-            rootInformationObject = new InformationObject("Insidelog", "Root Node", null, 0, 0, false, colorFileName);
+            rootInformationObject = new InformationObject("in'side log", "Root Node", null, 0, 0, false, colorFileName);
             treeRoot = new TreeItemNode(rootInformationObject, true);
             treeRoot.setGraphic(new ImageView(new Image("direction.png")));
             treeRoot.setExpanded(true);
@@ -1664,7 +1666,7 @@ public class Insidelog extends Application {
 
             ArrayList<String> fileList = new ArrayList();
             //fileList.add("default.cfg");
-            Insidelog.getConfigurationFileList(Paths.get("etc").toFile(), fileList);
+            InSideLog.getConfigurationFileList(Paths.get("etc").toFile(), fileList);
 
             choiceBoxColorTemplate.setItems(FXCollections.observableArrayList(fileList));
             int selectedIndexColor = 0;
@@ -1713,7 +1715,7 @@ public class Insidelog extends Application {
 
     public static void main(String[] args) {
 
-        Insidelog.args = args;
+        InSideLog.args = args;
 
         launch(args);
 

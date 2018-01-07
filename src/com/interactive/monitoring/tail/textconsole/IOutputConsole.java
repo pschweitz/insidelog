@@ -23,7 +23,8 @@ package com.interactive.monitoring.tail.textconsole;
  * @since   16.11.2015
  */
 
-import com.interactive.monitoring.tail.InformationObject;
+import com.interactive.insidelog.InformationObject;
+import com.interactive.insidelog.WindowTextConsoleSettings;
 
 public interface IOutputConsole {
     
@@ -34,9 +35,10 @@ public interface IOutputConsole {
     public void saveTextContent(String destinationFile); 
     public void copyStyledContent(); 
     public void copyTextContent();    
-    public void search(String text, boolean caseSensitive); 
+    public void search();
     public void zoomIn();    
     public void zoomOut();   
     public void zoomReset();       
     public void setInformationObject(InformationObject informationObject);
+    public void setSettings(WindowTextConsoleSettings settings);
 }
