@@ -85,6 +85,7 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -217,8 +218,8 @@ public class InSideLog extends Application {
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()) {
             String colorFile = result.get();
-            
-            if(!colorFile.startsWith("etc")){
+
+            if (!colorFile.startsWith("etc")) {
                 colorFile = "etc/" + colorFile;
             }
 
@@ -387,27 +388,25 @@ public class InSideLog extends Application {
         buttonBrowse.setPrefWidth(80);
         buttonBrowse.setOnAction(
                 new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(final ActionEvent e) {
-                        final FileChooser fileChooser = new FileChooser();
+            @Override
+            public void handle(final ActionEvent e) {
+                final FileChooser fileChooser = new FileChooser();
 
-                        if (!textFieldFileLocation.getText().equals("") && Files.exists(Paths.get(textFieldFileLocation.getText()))) {
+                if (!textFieldFileLocation.getText().equals("") && Files.exists(Paths.get(textFieldFileLocation.getText()))) {
 
-                            fileChooser.setInitialDirectory(Paths.get(textFieldFileLocation.getText()).getParent().toFile());
-                        } else {
-                            if (lastSelected != null) {
-                                fileChooser.setInitialDirectory(lastSelected.getParentFile());
-                            }
-                        }
-
-                        final File selectedFile = fileChooser.showOpenDialog(mainStage);
-                        if (selectedFile != null) {
-                            lastSelected = selectedFile;
-                            selectedFile.getAbsolutePath();
-                            textFieldFileLocation.setText(selectedFile.getAbsolutePath());
-                        }
-                    }
+                    fileChooser.setInitialDirectory(Paths.get(textFieldFileLocation.getText()).getParent().toFile());
+                } else if (lastSelected != null) {
+                    fileChooser.setInitialDirectory(lastSelected.getParentFile());
                 }
+
+                final File selectedFile = fileChooser.showOpenDialog(mainStage);
+                if (selectedFile != null) {
+                    lastSelected = selectedFile;
+                    selectedFile.getAbsolutePath();
+                    textFieldFileLocation.setText(selectedFile.getAbsolutePath());
+                }
+            }
+        }
         );
 
         textFieldFileLocation.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -494,10 +493,21 @@ public class InSideLog extends Application {
         vboxInformationGroup.setSpacing(15);
         vboxInformationGroup.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-        Image flexImage = new Image("tail_logo.png");
-        ImageView imageView = new ImageView(flexImage);
+        Image logoImage = new Image("tail_logo.png");
+        ImageView imageView = new ImageView(logoImage);
         imageView.setPreserveRatio(true);
         imageView.setFitHeight(75);
+
+        Image inslideshowImage = new Image("inslideshow.png");
+        ImageView imageViewInslideshow = new ImageView(inslideshowImage);
+        imageViewInslideshow.setPreserveRatio(true);
+        imageViewInslideshow.setFitHeight(70);
+
+        imageViewInslideshow.setOnMouseClicked(event -> {
+            if (event.getButton().equals(MouseButton.PRIMARY)) {
+                this.getHostServices().showDocument("http://redirect.in-slideshow.com/full");
+            }
+        });
 
         Hyperlink linkInteractive = new Hyperlink();
         linkInteractive.setText("in'teractive");
@@ -534,6 +544,8 @@ public class InSideLog extends Application {
         Label labelYear = new Label("- Apache v2 license - " + year);
         Label labelCreator = new Label("Created by");
         Label labelGitHub = new Label("in'side log is open source software, please visit");
+        Label labelInslideshow1 = new Label("Tranfer pictures or albums between   ");
+        Label labelInslideshow2 = new Label("   all smartphones brands, just click :");
 
         HBox hboxText = new HBox();
         hboxText.alignmentProperty().setValue(Pos.CENTER);
@@ -554,20 +566,22 @@ public class InSideLog extends Application {
         hboxGitHub.getChildren().add(labelGitHub);
         hboxGitHub.getChildren().add(linkGitHub);
 
+        HBox hboxInslideshow = new HBox();
+        hboxInslideshow.alignmentProperty().setValue(Pos.CENTER);
+        hboxInslideshow.getChildren().add(new VBox(5, new Label(), labelInslideshow1, labelInslideshow2));
+        hboxInslideshow.getChildren().add(imageViewInslideshow);
+
         vboxInformationRoot = new VBox();
         vboxInformationRoot.alignmentProperty().setValue(Pos.CENTER);
         vboxInformationRoot.setSpacing(15);
 
         vboxInformationRoot.getChildren().add(imageView);
         vboxInformationRoot.getChildren().add(new HBox());
-        vboxInformationRoot.getChildren().add(new HBox());
         vboxInformationRoot.getChildren().add(hboxText);
-        vboxInformationRoot.getChildren().add(new HBox());
         vboxInformationRoot.getChildren().add(hboxInteractive);
-        vboxInformationRoot.getChildren().add(new HBox());
         vboxInformationRoot.getChildren().add(hboxPHS);
-        vboxInformationRoot.getChildren().add(new HBox());
         vboxInformationRoot.getChildren().add(hboxGitHub);
+        vboxInformationRoot.getChildren().add(hboxInslideshow);
 
         vboxInformationRoot.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
@@ -645,86 +659,84 @@ public class InSideLog extends Application {
                     logger.warning("Node name already used: \"" + newTreeItemNode.getValue() + "\"");
                 }
 
-            } else {
-                if (selectedTreeItem != null) {
+            } else if (selectedTreeItem != null) {
 
-                    if (selectedTreeItem.isUniqNode(textFieldNodeName.getText()) || textFieldNodeName.getText().equals(selectedTreeItem.getInformationObject().getDisplayName())) {
+                if (selectedTreeItem.isUniqNode(textFieldNodeName.getText()) || textFieldNodeName.getText().equals(selectedTreeItem.getInformationObject().getDisplayName())) {
 
-                        String charset = (String) choiceBoxCharset.getSelectionModel().getSelectedItem();
-                        String colorTemplate = (String) choiceBoxColorTemplate.getSelectionModel().getSelectedItem();
+                    String charset = (String) choiceBoxCharset.getSelectionModel().getSelectedItem();
+                    String colorTemplate = (String) choiceBoxColorTemplate.getSelectionModel().getSelectedItem();
 
-                        selectedTreeItem.setGraphic(image);
+                    selectedTreeItem.setGraphic(image);
 
-                        boolean charsetChanged = false;
-                        int oldFrequency = selectedTreeItem.getInformationObject().getFrequency();
+                    boolean charsetChanged = false;
+                    int oldFrequency = selectedTreeItem.getInformationObject().getFrequency();
 
-                        if (!charset.equals("Auto detect")) {
+                    if (!charset.equals("Auto detect")) {
 
-                            try {
-                                if (selectedTreeItem.getInformationObject().getCharset() != null) {
-                                    if (!selectedTreeItem.getInformationObject().getCharset().name().equals(charset)) {
-                                        charsetChanged = true;
-                                    }
-                                } else {
+                        try {
+                            if (selectedTreeItem.getInformationObject().getCharset() != null) {
+                                if (!selectedTreeItem.getInformationObject().getCharset().name().equals(charset)) {
                                     charsetChanged = true;
                                 }
-
-                                selectedTreeItem.getInformationObject().setCharset(Charset.forName(charset));
-                            } catch (Exception e) {
-                            }
-                        } else {
-                            selectedTreeItem.getInformationObject().setCharset(null);
-                        }
-                        selectedTreeItem.getInformationObject().setFileColors("etc/" + colorTemplate);
-                        selectedTreeItem.getInformationObject().setColorConfiguration(new ColorConfiguration("etc/" + colorTemplate));
-                        selectedTreeItem.getInformationObject().setFilePath(textFieldFileLocation.getText());
-                        selectedTreeItem.getInformationObject().setBufferSize(Integer.parseInt(textFieldBufferSize.getText()));
-                        selectedTreeItem.getInformationObject().setFrequency(Integer.parseInt(textFieldFrequency.getText()));
-                        selectedTreeItem.getInformationObject().setFullName(TreeItemNode.getFullPath(selectedTreeItem));
-                        selectedTreeItem.setValue(textFieldNodeName.getText());
-                        selectedTreeItem.getInformationObject().setDisplayColors(displayColors.isSelected());
-                        selectedTreeItem.refreshNode(treeView);
-
-                        if (charsetChanged) {
-
-                            logger.debug("Charset Changed");
-                            selectedTreeItem.stopTailSchedule();
-
-                            try {
-                                Thread.sleep(oldFrequency + 50);
-                            } catch (InterruptedException ex) {
+                            } else {
+                                charsetChanged = true;
                             }
 
-                            selectedTreeItem.getInformationObject().setLastFileLength(0);
-                            selectedTreeItem.getInformationObject().setOffset(0);
-
-                            selectedTreeItem.startTailSchedule();
+                            selectedTreeItem.getInformationObject().setCharset(Charset.forName(charset));
+                        } catch (Exception e) {
                         }
-
-                        editFlag = false;
-                        save.setDisable(true);
-                        edit.setText("Edit");
-                        edit.requestFocus();
-                        gridPaneInformation.setDisable(true);
-                        labelNodeName.setDisable(true);
-                        textFieldNodeName.setDisable(true);
-                        choiceBoxColorTemplate.setDisable(true);
-                        choiceBoxCharset.setDisable(true);
-                        labelFrequency.setDisable(true);
-                        textFieldFrequency.setDisable(true);
-
-                        logger.debug("File succesfully updated: \"" + textFieldNodeName.getText() + "\"");
                     } else {
-
-                        Alert alert = new Alert(AlertType.WARNING);
-                        alert.setTitle("Warning Dialog");
-                        alert.setHeaderText("Name already in use");
-                        alert.setContentText("Name already in use: \"" + textFieldNodeName.getText() + "\"");
-
-                        alert.showAndWait();
-
-                        logger.warning("Node name already used: \"" + textFieldNodeName.getText() + "\"");
+                        selectedTreeItem.getInformationObject().setCharset(null);
                     }
+                    selectedTreeItem.getInformationObject().setFileColors("etc/" + colorTemplate);
+                    selectedTreeItem.getInformationObject().setColorConfiguration(new ColorConfiguration("etc/" + colorTemplate));
+                    selectedTreeItem.getInformationObject().setFilePath(textFieldFileLocation.getText());
+                    selectedTreeItem.getInformationObject().setBufferSize(Integer.parseInt(textFieldBufferSize.getText()));
+                    selectedTreeItem.getInformationObject().setFrequency(Integer.parseInt(textFieldFrequency.getText()));
+                    selectedTreeItem.getInformationObject().setFullName(TreeItemNode.getFullPath(selectedTreeItem));
+                    selectedTreeItem.setValue(textFieldNodeName.getText());
+                    selectedTreeItem.getInformationObject().setDisplayColors(displayColors.isSelected());
+                    selectedTreeItem.refreshNode(treeView);
+
+                    if (charsetChanged) {
+
+                        logger.debug("Charset Changed");
+                        selectedTreeItem.stopTailSchedule();
+
+                        try {
+                            Thread.sleep(oldFrequency + 50);
+                        } catch (InterruptedException ex) {
+                        }
+
+                        selectedTreeItem.getInformationObject().setLastFileLength(0);
+                        selectedTreeItem.getInformationObject().setOffset(0);
+
+                        selectedTreeItem.startTailSchedule();
+                    }
+
+                    editFlag = false;
+                    save.setDisable(true);
+                    edit.setText("Edit");
+                    edit.requestFocus();
+                    gridPaneInformation.setDisable(true);
+                    labelNodeName.setDisable(true);
+                    textFieldNodeName.setDisable(true);
+                    choiceBoxColorTemplate.setDisable(true);
+                    choiceBoxCharset.setDisable(true);
+                    labelFrequency.setDisable(true);
+                    textFieldFrequency.setDisable(true);
+
+                    logger.debug("File succesfully updated: \"" + textFieldNodeName.getText() + "\"");
+                } else {
+
+                    Alert alert = new Alert(AlertType.WARNING);
+                    alert.setTitle("Warning Dialog");
+                    alert.setHeaderText("Name already in use");
+                    alert.setContentText("Name already in use: \"" + textFieldNodeName.getText() + "\"");
+
+                    alert.showAndWait();
+
+                    logger.warning("Node name already used: \"" + textFieldNodeName.getText() + "\"");
                 }
             }
 
@@ -795,11 +807,11 @@ public class InSideLog extends Application {
 
                     treeView.setCellFactory(
                             new Callback<TreeView<String>, TreeCell<String>>() {
-                                @Override
-                                public TreeCell<String> call(TreeView<String> p) {
-                                    return new TreeCellImpl(p);
-                                }
-                            }
+                        @Override
+                        public TreeCell<String> call(TreeView<String> p) {
+                            return new TreeCellImpl(p);
+                        }
+                    }
                     );
 
                     treePane.getChildren().add(treeView);
@@ -879,11 +891,11 @@ public class InSideLog extends Application {
 
                 treeView.setCellFactory(
                         new Callback<TreeView<String>, TreeCell<String>>() {
-                            @Override
-                            public TreeCell<String> call(TreeView<String> p) {
-                                return new TreeCellImpl(p);
-                            }
-                        }
+                    @Override
+                    public TreeCell<String> call(TreeView<String> p) {
+                        return new TreeCellImpl(p);
+                    }
+                }
                 );
 
                 treePane.getChildren().add(treeView);
@@ -1016,52 +1028,52 @@ public class InSideLog extends Application {
         btAdd.setOnAction(
                 new EventHandler<ActionEvent>() {
 
-                    @Override
-                    public void handle(ActionEvent event) {
+            @Override
+            public void handle(ActionEvent event) {
 
-                        newTreeItemFlag = true;
+                newTreeItemFlag = true;
 
-                        textFieldNodeName.setText("");
-                        textFieldFileLocation.setText("");
+                textFieldNodeName.setText("");
+                textFieldFileLocation.setText("");
 
-                        if (ApplicationContext.getInstance().containsKey("tail.displayColor")) {
-                            displayColors.setSelected(ApplicationContext.getInstance().getBoolean("tail.displayColor"));
-                        } else {
-                            displayColors.setSelected(true);
-                        }
-
-                        if (ApplicationContext.getInstance().containsKey("tail.bufferSize")) {
-                            textFieldBufferSize.setText(ApplicationContext.getInstance().getString("tail.bufferSize"));
-                        } else {
-                            textFieldBufferSize.setText("100");
-                        }
-
-                        if (ApplicationContext.getInstance().containsKey("tail.frequencyInterval")) {
-                            textFieldFrequency.setText(ApplicationContext.getInstance().getString("tail.frequencyInterval"));
-                        } else {
-                            textFieldBufferSize.setText("500");
-                        }
-
-                        metricOveralDefinition.setVisible(true);
-                        gridPaneName.setDisable(false);
-                        labelNodeName.setDisable(false);
-                        textFieldNodeName.setDisable(false);
-
-                        save.setVisible(true);
-                        edit.setVisible(true);
-                        save.setDisable(false);
-                        edit.setDisable(false);
-                        gridPaneInformation.setDisable(false);
-                        labelNodeName.setDisable(false);
-                        textFieldNodeName.setDisable(false);
-                        labelFrequency.setDisable(false);
-                        textFieldFrequency.setDisable(false);
-
-                        edit.setText("Cancel");
-                        stackPaneInformation.getChildren().clear();
-                        stackPaneInformation.getChildren().add(vboxInformationFile);
-                    }
+                if (ApplicationContext.getInstance().containsKey("tail.displayColor")) {
+                    displayColors.setSelected(ApplicationContext.getInstance().getBoolean("tail.displayColor"));
+                } else {
+                    displayColors.setSelected(true);
                 }
+
+                if (ApplicationContext.getInstance().containsKey("tail.bufferSize")) {
+                    textFieldBufferSize.setText(ApplicationContext.getInstance().getString("tail.bufferSize"));
+                } else {
+                    textFieldBufferSize.setText("100");
+                }
+
+                if (ApplicationContext.getInstance().containsKey("tail.frequencyInterval")) {
+                    textFieldFrequency.setText(ApplicationContext.getInstance().getString("tail.frequencyInterval"));
+                } else {
+                    textFieldBufferSize.setText("500");
+                }
+
+                metricOveralDefinition.setVisible(true);
+                gridPaneName.setDisable(false);
+                labelNodeName.setDisable(false);
+                textFieldNodeName.setDisable(false);
+
+                save.setVisible(true);
+                edit.setVisible(true);
+                save.setDisable(false);
+                edit.setDisable(false);
+                gridPaneInformation.setDisable(false);
+                labelNodeName.setDisable(false);
+                textFieldNodeName.setDisable(false);
+                labelFrequency.setDisable(false);
+                textFieldFrequency.setDisable(false);
+
+                edit.setText("Cancel");
+                stackPaneInformation.getChildren().clear();
+                stackPaneInformation.getChildren().add(vboxInformationFile);
+            }
+        }
         );
 
         btRemove = new Button();
@@ -1106,47 +1118,44 @@ public class InSideLog extends Application {
 
         edit.setOnAction(
                 new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(final ActionEvent e) {
+            @Override
+            public void handle(final ActionEvent e) {
 
-                        if (newTreeItemFlag) {
+                if (newTreeItemFlag) {
 
-                            save.setVisible(false);
-                            edit.setVisible(false);
-                            metricOveralDefinition.setVisible(false);
+                    save.setVisible(false);
+                    edit.setVisible(false);
+                    metricOveralDefinition.setVisible(false);
 
-                            refreshInformationVBox((TreeItemNode) treeView.getSelectionModel().getSelectedItem());
-                            edit.setText("Edit");
-                        } else {
-
-                            if (editFlag) {
-                                editFlag = !editFlag;
-                                save.setDisable(true);
-                                edit.setText("Edit");
-                                edit.requestFocus();
-                                gridPaneInformation.setDisable(true);
-                                labelNodeName.setDisable(true);
-                                textFieldNodeName.setDisable(true);
-                                choiceBoxColorTemplate.setDisable(true);
-                                choiceBoxCharset.setDisable(true);
-                                labelFrequency.setDisable(true);
-                                textFieldFrequency.setDisable(true);
-                            } else {
-                                editFlag = !editFlag;
-                                save.setDisable(false);
-                                labelNodeName.setDisable(false);
-                                textFieldNodeName.setDisable(false);
-                                gridPaneInformation.setDisable(false);
-                                choiceBoxColorTemplate.setDisable(false);
-                                choiceBoxCharset.setDisable(false);
-                                labelFrequency.setDisable(false);
-                                textFieldFrequency.setDisable(false);
-                                edit.setText("Cancel");
-                                save.requestFocus();
-                            }
-                        }
-                    }
+                    refreshInformationVBox((TreeItemNode) treeView.getSelectionModel().getSelectedItem());
+                    edit.setText("Edit");
+                } else if (editFlag) {
+                    editFlag = !editFlag;
+                    save.setDisable(true);
+                    edit.setText("Edit");
+                    edit.requestFocus();
+                    gridPaneInformation.setDisable(true);
+                    labelNodeName.setDisable(true);
+                    textFieldNodeName.setDisable(true);
+                    choiceBoxColorTemplate.setDisable(true);
+                    choiceBoxCharset.setDisable(true);
+                    labelFrequency.setDisable(true);
+                    textFieldFrequency.setDisable(true);
+                } else {
+                    editFlag = !editFlag;
+                    save.setDisable(false);
+                    labelNodeName.setDisable(false);
+                    textFieldNodeName.setDisable(false);
+                    gridPaneInformation.setDisable(false);
+                    choiceBoxColorTemplate.setDisable(false);
+                    choiceBoxCharset.setDisable(false);
+                    labelFrequency.setDisable(false);
+                    textFieldFrequency.setDisable(false);
+                    edit.setText("Cancel");
+                    save.requestFocus();
                 }
+            }
+        }
         );
 
         save = new Button();
@@ -1156,13 +1165,13 @@ public class InSideLog extends Application {
 
         save.setOnAction(
                 new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(final ActionEvent e) {
+            @Override
+            public void handle(final ActionEvent e) {
 
-                        // button.fire() Not working on all Windows 7 with all JRE..., 
-                        fireSaveButton();
-                    }
-                }
+                // button.fire() Not working on all Windows 7 with all JRE..., 
+                fireSaveButton();
+            }
+        }
         );
 
         btColorChooser = new Button();
@@ -1174,15 +1183,15 @@ public class InSideLog extends Application {
         btColorChooser.setOnAction(
                 new EventHandler<ActionEvent>() {
 
-                    @Override
-                    public void handle(ActionEvent event) {
+            @Override
+            public void handle(ActionEvent event) {
 
-                        rootInformationObject.setColorConfiguration((ColorConfiguration) ApplicationContext.getInstance().get("colorDefaultConfiguration"));
+                rootInformationObject.setColorConfiguration((ColorConfiguration) ApplicationContext.getInstance().get("colorDefaultConfiguration"));
 
-                        ColorChooserWindow colorChooserWindow = new ColorChooserWindow(rootInformationObject, colorFileName);
-                        colorChooserWindow.start(new Stage());
-                    }
-                }
+                ColorChooserWindow colorChooserWindow = new ColorChooserWindow(rootInformationObject, colorFileName);
+                colorChooserWindow.start(new Stage());
+            }
+        }
         );
 
         btHelp = new Button();
@@ -1194,30 +1203,30 @@ public class InSideLog extends Application {
         btHelp.setOnAction(
                 new EventHandler<ActionEvent>() {
 
-                    @Override
-                    public void handle(ActionEvent event) {
+            @Override
+            public void handle(ActionEvent event) {
 
-                        if (Files.exists(Paths.get("UserManual.pdf"))) {
+                if (Files.exists(Paths.get("UserManual.pdf"))) {
 
-                            String osName = System.getProperty("os.name").toLowerCase();
-                            if (!osName.contains("nix") && !osName.contains("nux") && !osName.contains("aix")) {
-                                if (Desktop.isDesktopSupported()) {
-                                    try {
-                                        File myFile = new File("UserManual.pdf");
-                                        Desktop.getDesktop().open(myFile);
-                                    } catch (IOException ex) {
-                                        logger.info("No PDF reader found");
-                                        getHostServices().showDocument("https://github.com/pschweitz/insidelog");
-                                    }
-                                }
-                            } else {
+                    String osName = System.getProperty("os.name").toLowerCase();
+                    if (!osName.contains("nix") && !osName.contains("nux") && !osName.contains("aix")) {
+                        if (Desktop.isDesktopSupported()) {
+                            try {
+                                File myFile = new File("UserManual.pdf");
+                                Desktop.getDesktop().open(myFile);
+                            } catch (IOException ex) {
+                                logger.info("No PDF reader found");
                                 getHostServices().showDocument("https://github.com/pschweitz/insidelog");
                             }
-                        } else {
-                            getHostServices().showDocument("https://github.com/pschweitz/insidelog");
                         }
+                    } else {
+                        getHostServices().showDocument("https://github.com/pschweitz/insidelog");
                     }
+                } else {
+                    getHostServices().showDocument("https://github.com/pschweitz/insidelog");
                 }
+            }
+        }
         );
 
         toolBar = new HBox();
@@ -1325,11 +1334,11 @@ public class InSideLog extends Application {
 
         treeView.setCellFactory(
                 new Callback<TreeView<String>, TreeCell<String>>() {
-                    @Override
-                    public TreeCell<String> call(TreeView<String> p) {
-                        return new TreeCellImpl(p);
-                    }
-                }
+            @Override
+            public TreeCell<String> call(TreeView<String> p) {
+                return new TreeCellImpl(p);
+            }
+        }
         );
 
         treePane.getChildren().add(treeView);
@@ -1580,8 +1589,8 @@ public class InSideLog extends Application {
 
         mainStage.setResizable(false);
         mainStage.setTitle("in'side log");
-        mainStage.setMinHeight(520);
-        mainStage.setMinWidth(350);
+        mainStage.setMinHeight(550);
+        mainStage.setMinWidth(360);
 
         mainStage.setWidth(650);
         mainStage.setHeight(470);
@@ -2180,49 +2189,46 @@ public class InSideLog extends Application {
             if (empty) {
                 setText(null);
                 setGraphic(null);
+            } else if (isEditing()) {
+
             } else {
+                setText(getString());
+                setGraphic(getTreeItem().getGraphic());
 
-                if (isEditing()) {
+                addMenu = new ContextMenu();
 
-                } else {
-                    setText(getString());
-                    setGraphic(getTreeItem().getGraphic());
+                if (((TreeItemNode) getTreeItem()).isFile()) {
 
-                    addMenu = new ContextMenu();
-
-                    if (((TreeItemNode) getTreeItem()).isFile()) {
-
-                        if (!addMenu.getItems().contains(addMenuItemCleanStart)) {
-                            addMenu.getItems().add(addMenuItemCleanStart);
-                        }
-
-                        if (!addMenu.getItems().contains(addMenuItemStop)) {
-                            addMenu.getItems().add(addMenuItemStop);
-                            addMenu.getItems().add(separatorMenuItem);
-                        }
-
-                        if (!addMenu.getItems().contains(addMenuCopy)) {
-                            addMenu.getItems().add(addMenuCopy);
-                        }
+                    if (!addMenu.getItems().contains(addMenuItemCleanStart)) {
+                        addMenu.getItems().add(addMenuItemCleanStart);
                     }
-                    if (!addMenu.getItems().contains(addMenuPaste)) {
 
-                        //                addMenuPaste.setDisable(true);
-                        addMenu.getItems().add(addMenuPaste);
-                        addMenu.getItems().add(separatorMenuItem2);
+                    if (!addMenu.getItems().contains(addMenuItemStop)) {
+                        addMenu.getItems().add(addMenuItemStop);
+                        addMenu.getItems().add(separatorMenuItem);
                     }
-                    if (!addMenu.getItems().contains(addMenuItemRename)) {
-                        addMenu.getItems().add(addMenuItemRename);
-                    }
-                    if (((TreeItemNode) getTreeItem()).isNode()) {
 
-                        if (!addMenu.getItems().contains(addMenuItemGroup)) {
-                            addMenu.getItems().add(separatorMenuItem);
-                            addMenu.getItems().add(addMenuItemGroup);
-                        }
+                    if (!addMenu.getItems().contains(addMenuCopy)) {
+                        addMenu.getItems().add(addMenuCopy);
                     }
-                    setContextMenu(addMenu);
                 }
+                if (!addMenu.getItems().contains(addMenuPaste)) {
+
+                    //                addMenuPaste.setDisable(true);
+                    addMenu.getItems().add(addMenuPaste);
+                    addMenu.getItems().add(separatorMenuItem2);
+                }
+                if (!addMenu.getItems().contains(addMenuItemRename)) {
+                    addMenu.getItems().add(addMenuItemRename);
+                }
+                if (((TreeItemNode) getTreeItem()).isNode()) {
+
+                    if (!addMenu.getItems().contains(addMenuItemGroup)) {
+                        addMenu.getItems().add(separatorMenuItem);
+                        addMenu.getItems().add(addMenuItemGroup);
+                    }
+                }
+                setContextMenu(addMenu);
             }
         }
 
