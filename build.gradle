@@ -1,0 +1,221 @@
+import java.text.SimpleDateFormat
+
+plugins {
+    id 'java'
+}
+
+group 'recordins'
+version '1.5'
+version = version + ("master" == gitCurBranch() ? "-RELEASE" : "-SNAPSHOT")
+
+def gitCurBranch() {
+    def process = "git rev-parse --abbrev-ref HEAD".execute()
+    return process.text.trim()
+}
+
+def date = buildTime();
+
+def buildTime() {
+    def df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ") // you can change it
+    df.setTimeZone(TimeZone.getTimeZone("UTC"))
+    return df.format(new Date())
+}
+
+//sourceCompatibility = 1.8
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+sourceSets.main.resources { srcDirs = ["src/main/java"]; exclude "**/*.java" }
+
+
+// need higher version than ide default to support java 11
+// this is for legacy gradle < 5.0
+task wrapper(type: Wrapper) {
+    gradleVersion = "4.9"
+}
+
+// this is for gradle >= 5.0
+wrapper {
+    gradleVersion = "4.9"
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    /* used to retrive dependencies online*/
+    //compile group: 'com.auth0', name: 'java-jwt', version: '3.4.0'
+    //compile group: 'com.github.oshi', name: 'oshi-core', version: '3.9.0'
+
+    compile fileTree(dir: 'lib', include: '*.jar')
+    runtime fileTree(dir: 'lib', include: '*.jar')
+
+}
+
+task packageTests(type: Jar) {
+    baseName = rootProject.name + 'Test'
+    manifest {
+        attributes(
+                "Created-By": 'Philippe Schweitzer - Blockchain Recordin Solutions',
+                "Class-Path": 'lib/' + configurations.compile.collect { it.getName() }.join(' lib/'),// + ' lib/CheetahWebserver-' + version + '.jar',
+                "Main-Class": 'com.recordins.insidelog.InSideLogTest',
+                "Cheetah-Version": version,
+                "Build-Time-ISO-8601": date
+        )
+    }
+    from sourceSets.test.output
+}
+
+task customFatJar(type: Jar) {
+    doFirst {
+        libFolder()
+    }
+    manifest {
+        attributes(
+                "Created-By": 'Philippe Schweitzer - Blockchain Recordin Solutions',
+                "Class-Path": 'lib/' + configurations.compile.collect { it.getName() }.join(' lib/'),
+                "Main-Class": 'com.recordins.insidelog.InSideLog',
+                "Cheetah-Version": version,
+                "Build-Time-ISO-8601": date
+        )
+    }
+    baseName = rootProject.name + '-all-in-one-jar'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
+    with jar
+}
+
+jar {
+    dependsOn customFatJar
+    doFirst {
+        libFolder()
+    }
+    baseName = rootProject.name
+    manifest {
+        attributes(
+                "Created-By": 'Philippe Schweitzer - Blockchain Recordin Solutions',
+                "Class-Path": 'lib/' + configurations.compile.collect { it.getName() }.join(' lib/'),
+                "Main-Class": 'com.recordins.insidelog.InSideLog',
+                "Cheetah-Version": version,
+                "Build-Time-ISO-8601": date
+        )
+    }
+}
+
+/*
+ *
+ * Used to retrieve all dependencies and put them into lib/folder
+ */
+def libFolder() {
+    project.configurations.compile.resolvedConfiguration.resolvedArtifacts.each {
+        //println it.name // << the artifact name
+        //println it.file // << the file reference
+
+        def libfile = it.file;
+        copy {
+            from "$libfile"
+            into "lib"
+        }
+    }
+}
+
+clean {
+    doFirst {
+        def jarname = rootProject.name + "-" + version + ".jar"
+        def file = new File(jarname)
+
+        if(file.exists()){
+            delete jarname
+        }
+
+        jarname = rootProject.name + 'Test' + "-" + version + ".jar"
+        file = new File(jarname)
+
+        if(file.exists()){
+            delete jarname
+        }
+    }
+}
+
+//noinspection GroovyAssignabilityCheck
+build {
+    //dependsOn packageTests
+
+    doLast {
+        def jarname = rootProject.name + "-" + version + ".jar"
+        def file = new File(jarname)
+
+        if(file.exists()){
+            delete jarname
+        }
+
+        copy{
+            from "$buildDir/libs/" + jarname
+            into "$projectDir/"
+        }
+
+        jarname = rootProject.name + 'Test' + "-" + version + ".jar"
+        file = new File(jarname)
+
+        if(file.exists()){
+            delete jarname
+        }
+        copy {
+            from "$buildDir/libs/" + jarname
+            into "$projectDir/"
+        }
+    }
+}
+
+test {
+    dependsOn packageTests
+    /*
+    print "RUN TEST\n"
+
+
+    copy{
+        from "$buildDir/libs/CheetahWebserver-" + version + '.jar'
+        into "$projectDir/lib"
+    }
+
+    def jarname = "CheetahWebserverTest" + "-" + version + ".jar"
+
+    def file = new File("$projectDir/" + jarname)
+
+    if(file.exists()){
+        delete "$projectDir/" + jarname
+    }
+
+    copy{
+        from "$buildDir/libs/" + jarname
+        into "$projectDir/"
+    }
+
+    //def file = new File("$projectDir/" + jarname)
+
+    if(file.exists()){
+
+
+      //  def sout = new StringBuilder(), serr = new StringBuilder()
+      //  def command = 'java -jar ' + jarname
+      //  def proc = command.execute()
+      //  proc.consumeProcessOutput(sout, serr)
+      //  proc.waitForOrKill(1000000)
+
+
+        javaexec {
+            main="-jar";
+            args = [
+                jarname,
+
+        ""
+            ]
+        }
+    }
+    else{
+        print "jar executable: " + jarname + " does not exist \n"
+    }
+    */
+}

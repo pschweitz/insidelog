@@ -4,5 +4,10 @@
 /UserManual.pptx
 /build.xml
 /manifest.mf
+/gradle
+gradlew*
+.gradle
 .idea
 out
+InSideLog-*
+InSideLogTest-*

@@ -1,5 +1,5 @@
-Insidelog is a tool created by in'teractive
-http://www.in-teractive.com
+Insidelog is a tool created by Blockchain Record'in Solutions
+https://www.recordins.com
 https://ch.linkedin.com/pub/philippe-schweitzer/87/ab/2bb
 
 Download available from this page: https://github.com/pschweitz/insidelog/releases
@@ -16,7 +16,7 @@ Sorry for Mac users, packaged build is not available for the moment.
 It is released under Apache v2 License
 
 /*
- * Copyright 2018 in'teractive.
+ * Copyright 2019 Blockchain Record'in Solutions.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
