@@ -1,6 +1,7 @@
-Insidelog is a tool created by Blockchain Record'in Solutions
-https://www.recordins.com
+Insidelog is a colirized real-time log viewer tool created by Philippe Schweitzer
 https://ch.linkedin.com/pub/philippe-schweitzer/87/ab/2bb
+
+Find the user manual here: https://github.com/pschweitz/insidelog/blob/master/UserManual.pdf
 
 Download available from this page: https://github.com/pschweitz/insidelog/releases
 
@@ -16,7 +17,7 @@ Sorry for Mac users, packaged build is not available for the moment.
 It is released under Apache v2 License
 
 /*
- * Copyright 2019 Blockchain Record'in Solutions.
+ * Copyright 2022 Philippe Schweitzer.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

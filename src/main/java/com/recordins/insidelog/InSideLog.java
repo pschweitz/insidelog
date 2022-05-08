@@ -107,7 +107,7 @@ public class InSideLog extends Application {
 
     private static final Logger logger = Logger.getLogger(InSideLog.class);
 
-    public int year = 2019;
+    public int year = 2022;
     public String version = "1.5";
 
     private static String[] args;
@@ -533,7 +533,7 @@ public class InSideLog extends Application {
         });
 
         Hyperlink linkGitHub = new Hyperlink();
-        linkGitHub.setText("GitHub page");
+        linkGitHub.setText("GitHub page !");
         linkGitHub.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -543,9 +543,11 @@ public class InSideLog extends Application {
         });
 
         Label labelText = new Label("in'side log - The colorized log viewer v" + version);
-        Label labelYear = new Label("- Apache v2 license - " + year);
+        //Label labelYear = new Label("- Apache v2 license - " + year);
+        Label labelYear = new Label("Apache v2 license - " + year);
         Label labelCreator = new Label("Created by");
-        Label labelGitHub = new Label("in'side log is open source software, please visit");
+        //    Label labelGitHub = new Label("in'side log is open source software, please visit");
+        Label labelGitHub = new Label("If you like it, please star it on");
         Label labelRecordins1 = new Label("Create your private blockchain, faster");
         Label labelRecordins2 = new Label("with easy data model and ACLs definition");
 
@@ -555,7 +557,7 @@ public class InSideLog extends Application {
 
         HBox hboxRecordins = new HBox();
         hboxRecordins.alignmentProperty().setValue(Pos.CENTER);
-        hboxRecordins.getChildren().add(linkRecordins);
+        //    hboxRecordins.getChildren().add(linkRecordins);
         hboxRecordins.getChildren().add(labelYear);
 
         HBox hboxPHS = new HBox();
@@ -583,7 +585,7 @@ public class InSideLog extends Application {
         vboxInformationRoot.getChildren().add(hboxRecordins);
         vboxInformationRoot.getChildren().add(hboxPHS);
         vboxInformationRoot.getChildren().add(hboxGitHub);
-        vboxInformationRoot.getChildren().add(hboxRecordins2);
+        //    vboxInformationRoot.getChildren().add(hboxRecordins2);
 
         vboxInformationRoot.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
