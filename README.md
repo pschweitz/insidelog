@@ -1,12 +1,12 @@
-## Insidelog is a colirized real-time log viewer tool 
-Created by [PHilippe Schweitzer](https://ch.linkedin.com/pub/philippe-schweitzer/87/ab/2bb)
+## Insidelog is a colirized real-time log viewer tool made in Java
+Created by [Philippe Schweitzer](https://ch.linkedin.com/pub/philippe-schweitzer/87/ab/2bb)
 
 ![alt text](https://github.com/pschweitz/insidelog/blob/master/InSideLog.png)
 
 ## Find the user manual here: 
 https://github.com/pschweitz/insidelog/blob/master/UserManual.pdf 
 
-## Download available from this page: 
+## Downloads are available in this page: 
 https://github.com/pschweitz/insidelog/releases
 
 You can find packaged builds with embedded Java, so run of software will be very straightforward.
